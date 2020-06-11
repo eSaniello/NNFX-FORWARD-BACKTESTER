@@ -6,6 +6,7 @@
 # Proceed to next candle
 import zmq
 import json
+from time import sleep
 
 context = zmq.Context()
 socket = context.socket(zmq.REP)
@@ -16,60 +17,76 @@ pub.bind("tcp://*:6666")
 
 everyone_conected = False
 json_msg = None
+signals_dict = {}
+max_clients = 2
+counter = 0
+
+print("Starting backward forward server")
+print("Waiting for clients to connect...")
 
 while True:
-    counter = 0
-    #  Wait for next request from client
-    while True:
-        message = socket.recv()
-        json_msg = json.loads(message)
-        print(json_msg)
+    while counter <= max_clients:
+        if everyone_conected == False:
+            message = socket.recv()
+            json_msg = json.loads(message)
 
-        if json_msg != None:
-            counter = counter + 1
-            socket.send(b"OK")
-            print(json_msg["symbol"], "conncected")
+            if json_msg != None:
+                counter = counter + 1
+                socket.send(b"OK")
+                print(json_msg["symbol"], "conncected")
 
-            if counter >= 1:
-                print("everyone connected")
-                break
+                signals_dict[json_msg["symbol"]] = json_msg
 
-    # if everyone_conected == False:
-    #     message = socket.recv()
-    #     json_msg = json.loads(message)
-    #     print(json_msg)
+                if counter >= max_clients:
+                    print("Total of %i clients connected" % counter)
+                    print("Starting backtest:")
+                    everyone_conected = True
+                    break
+        else:
+            break
 
-    #     if json_msg != None:
-    #         counter = counter + 1
-    #         socket.send(b"OK")
-    #         print(json_msg["symbol"], "conncected")
+    if everyone_conected:
+        print("Got signals via REP socket")
+        print(signals_dict)
 
-    #         if counter >= 1:
-    #             print("everyone connected")
-    #             everyone_conected = True
+        print("Sending response via PUB socket")
+        for i in signals_dict:
+            if signals_dict[i]["signal"] == "FLAT":
+                topic = signals_dict[i]["symbol"]
+                message_data = "FLAT"
+                print("%s %s" % (topic, message_data))
+                sleep(1)
+                pub.send_string("%s %s" % (topic, message_data))
 
-    # if everyone_conected == True:
-        # Check for data and send reply
+            elif signals_dict[i]["signal"] == "SHORT":
+                topic = signals_dict[i]["symbol"]
+                message_data = "SHORT"
+                print("%s %s" % (topic, message_data))
+                pub.send_string("%s %s" % (topic, message_data))
 
-    # message = socket.recv()
-    # json_msg = json.loads(message)
-    # print(json_msg)
+            elif signals_dict[i]["signal"] == "LONG":
+                topic = signals_dict[i]["symbol"]
+                message_data = "LONG"
+                print("%s %s" % (topic, message_data))
+                pub.send_string("%s %s" % (topic, message_data))
+            else:
+                print("send meh")
 
-    if json_msg["signal"] == "FLAT":
-        topic = json_msg["symbol"]
-        message_data = "hi"
-        pub.send_string("%s %s" % (topic, message_data))
-        # socket.send(b"OK")
-        # print('signal sent', "%s %s" % (topic, message_data))
+        print("second", signals_dict)
 
-        # if json_msg["signal"] == "SHORT" and json_msg["open_orders"] == "0":
-        #     socket.send(b"SHORT")
+        ctr = 0
+        while ctr <= max_clients:
+            message = socket.recv()
+            json_msg = json.loads(message)
 
-        # if json_msg["signal"] == "SHORT" and json_msg["open_orders"] != "0":
-        #     socket.send(b"FLAT")
+            if json_msg != None:
+                ctr = ctr + 1
+                socket.send(b"OK")
 
-        # if json_msg["signal"] == "LONG" and json_msg["open_orders"] == "0":
-        #     socket.send(b"LONG")
+                # signals_dict[json_msg["symbol"]] = json_msg
+                signals_dict.update({json_msg["symbol"]: json_msg})
 
-        # if json_msg["signal"] == "LONG" and json_msg["open_orders"] != "0":
-        #     socket.send(b"FLAT")
+                print("third", signals_dict)
+
+                if ctr >= max_clients:
+                    break
