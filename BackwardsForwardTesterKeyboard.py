@@ -31,21 +31,17 @@ def kbfunc():
     return ret
 
 
-# def decodeSignal(signal):
-
-#     signal = signal.split(",")
-#     ret = {}
-#     # TODO: change columns to int/double where needed
-#     for item in signal:
-#         item = item.split(":")
-
-#         # Remove '' from around the item
-#         ret[item[0]] = item[1][1:len(item[1]) - 1]
-
-#     return ret
-
 def decodeSignal(signal):
     json_msg = json.loads(signal)
+    # atr = int(json_msg['atr'])
+    trade1 = int(json_msg['trade1'])
+    trade2 = int(json_msg['trade2'])
+    _signal = int(json_msg['signal'])
+
+    # json_msg['atr'] = atr
+    json_msg['trade1'] = trade1
+    json_msg['trade2'] = trade2
+    json_msg['signal'] = _signal
 
     return json_msg
 
@@ -93,6 +89,7 @@ print("Waiting for testers to connect...")
 
 signals = {}
 clients = 0
+max_clients = 2
 
 while True:
     try:
@@ -109,12 +106,12 @@ while True:
             signals[signal['symbol']] = signal
 
         # Ok we have decoded the signal, tell the client we are done for now
-        socket.send_string("ok")
+        socket.send_string("OK")
         print(signals)
 
         # TODO: remove this for proper testing
         # break out of loop once we have more than 1 client for testing purposes
-        if clients > 1:
+        if clients >= max_clients:
             break
 
     except zmq.error.Again:
@@ -160,11 +157,11 @@ while True:
                 exposure[quote]['LONG'] = 0
                 exposure[quote]['SHORT'] = 0
 
-            if int(signal[trade]) != '-1':
-                if int(signal[trade] == '0'):  # LONG
+            if int(signal[trade]) != -1:
+                if int(signal[trade] == 0):  # LONG
                     exposure[base]['LONG'] += 1  # Base currency
                     exposure[quote]['SHORT'] += 1  # Quote currency
-                elif int(signal[trade]) == '1':  # SHORT
+                elif int(signal[trade]) == 1:  # SHORT
                     exposure[base]['SHORT'] += 1  # Base currency
                     exposure[quote]['LONG'] += 1  # Quote currency
 
@@ -203,12 +200,13 @@ while True:
         if trade:
             signals[symbol]['instruction'] = 'trade:1'
         else:
-            signals[symbol]['instruction'] = 'next'
+            signals[symbol]['instruction'] = 'NEXT'
 
     print("Sending instructions via PUB socket...")
 
     for symbol in signals:
         pub.send_string(f"{symbol} {signals[symbol]['instruction']}")
+        print(f"{symbol} {signals[symbol]['instruction']}")
 
     # OK Instructions set, waiting for next candle information
     signals = {}
@@ -223,7 +221,7 @@ while True:
                 signals[signal['symbol']] = signal
 
             # Ok we have decoded the signal, tell the client we are done for now
-            socket.send_string("ok")
+            socket.send_string("OK")
 
             # break out of loop once we have signals from every client
             if len(signals) == clients:
@@ -247,7 +245,7 @@ print(signals)
 #print(f"{topic} {messagedata}")
 #pub.send_string(topic + " " + messagedata)
 #pub.send_string(f"{topic}d {messagedata}")
-#pub.send(b"AUDUSD Shitnigger")
+#pub.send(b"AUDUSD MEOW")
 # pub.send(b"test")
 #pub.send(b"AUDUSD close")
 
