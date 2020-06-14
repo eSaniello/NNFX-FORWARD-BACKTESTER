@@ -201,9 +201,8 @@ while True:
                     exposure[quote]['LONG'] = 2
 
             if not trade:
-                print(" **** Currency over exposure on ", symbol)
+                print(f" **** CURRENCY EXPOSURE ON {symbol} *** ")
 
-        # if signals[symbol]['open_orders'] == 0:
         if trade:
             if _long:
                 signals[symbol]['instruction'] = 'LONG'
