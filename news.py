@@ -2,6 +2,7 @@ import sqlite3
 from sqlite3 import Error
 import csv
 from datetime import datetime
+from datetime import timedelta
 
 
 def create_connection(db_file):
@@ -34,13 +35,27 @@ if __name__ == '__main__':
     con = create_connection(r"db\news.db")
     # cur = con.cursor()
     # # use your column names here
-    # # cur.execute("""CREATE TABLE news (
-    # #     id integer PRIMARY KEY,
-    # #     date text,
-    # #     currency text,
-    # #     impact text,
-    # #     description text
-    # #     );""")
+    # cur.execute("""CREATE TABLE news (
+    #     id integer PRIMARY KEY,
+    #     date text,
+    #     currency text,
+    #     impact text,
+    #     description text,
+    #     actual text,
+    #     forecast text,
+    #     previous text,
+    #     revisedFrom text,
+    #     eventId text
+    #     );""")
 
-    # # con.commit()
+    # with open('news.csv', 'r') as fin:  # `with` statement available in 2.5+
+    #     # csv.DictReader uses first line in file for column headings by default
+    #     dr = csv.DictReader(fin)  # comma is default delimiter
+    #     to_db = [(i['date'], i['currency'], i['impact'], i['description'], i['actual'],
+    #               i['forecast'], i['previous'], i['revisedFrom'], i['eventId']) for i in dr]
+
+    # cur.executemany(
+    #     "INSERT INTO news (date, currency, impact, description, actual, forecast, previous, revisedFrom, eventId) VALUES (?, ?,?,?,?,?,?,?,?);", to_db)
+
+    # con.commit()
     # con.close()
