@@ -28,6 +28,14 @@ def check_for_news(date, high_impact_only=False):
     :return: to trade or not to trade boolean
     """
 
+    # TODO:
+    # Check Dacks ea for specific news to avoid and how he did it
+    # Check if there is news in the next 24 hours
+    # If there is then don't trade
+    # If in a losing trade then exit
+    # if the first trade hit tp then do nothing
+
+    # convert to datetime format that is in database
     current_date = datetime.strptime(date, '%Y.%m.%d %H:%M:%S')
 
 
