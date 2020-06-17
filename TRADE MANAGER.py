@@ -3,6 +3,7 @@ import time
 import sys
 import msvcrt
 import json
+from news import check_for_news
 
 context = zmq.Context()
 
@@ -91,7 +92,7 @@ print("Waiting for clients to connect...")
 
 signals = {}
 clients = 0
-max_clients = 2
+max_clients = 1
 
 while True:
     try:
@@ -173,32 +174,50 @@ while True:
 
     # this will just be a race to whos first, need to sort signals buy an order at some stage
 
+    # TODO: NEWS
+    # If there is then don't trade
+    # If in a losing trade then exit
+    # if the first trade hit tp then do nothing
+
     for symbol in signals:
         trade = False
         _long = False
         _short = False
+        news = False
+        close_trades = False
+
+        # check if we have enough exposure free
+        base = symbol[0:3]
+        quote = symbol[3:6]
+
+        # check for upcomming news events
+        news = check_for_news(
+            24, signals[symbol]['date'], symbol, base, quote, False)
+
+        if news == True:
+            if signals[symbol]['trade1'] == -1 and signals[symbol]['trade1'] != -1:
+                close_trades = False
+            else:
+                close_trades = True
 
         if int(signals[symbol]['signal']) > 0:
-            # check if we have enough exposure free
-            base = symbol[0:3]
-            quote = symbol[3:6]
-
-            if int(signals[symbol]['signal']) == 1:  # LONG
-                if exposure[base]['LONG'] == 0 and exposure[quote]['SHORT'] == 0:
-                    # take the trade and set it to full exposure
-                    trade = True
-                    _long = True
-                    _short = False
-                    exposure[base]['LONG'] = 2
-                    exposure[quote]['SHORT'] = 2
-            elif int(signals[symbol]['signal']) == 2:  # SHORT
-                if exposure[base]['SHORT'] == 0 and quote in exposure and exposure[quote]['LONG'] == 0:
-                    # take the trade and set it to full exposure
-                    trade = True
-                    _long = False
-                    _short = True
-                    exposure[base]['SHORT'] = 2
-                    exposure[quote]['LONG'] = 2
+            if not close_trades:
+                if int(signals[symbol]['signal']) == 1:  # LONG
+                    if exposure[base]['LONG'] == 0 and exposure[quote]['SHORT'] == 0:
+                        # take the trade and set it to full exposure
+                        trade = True
+                        _long = True
+                        _short = False
+                        exposure[base]['LONG'] = 2
+                        exposure[quote]['SHORT'] = 2
+                elif int(signals[symbol]['signal']) == 2:  # SHORT
+                    if exposure[base]['SHORT'] == 0 and quote in exposure and exposure[quote]['LONG'] == 0:
+                        # take the trade and set it to full exposure
+                        trade = True
+                        _long = False
+                        _short = True
+                        exposure[base]['SHORT'] = 2
+                        exposure[quote]['LONG'] = 2
 
             if not trade:
                 print(f" **** CURRENCY EXPOSURE ON {symbol} *** ")
@@ -208,6 +227,8 @@ while True:
                 signals[symbol]['instruction'] = 'LONG'
             elif _short:
                 signals[symbol]['instruction'] = 'SHORT'
+        elif close_trades:
+            signals[symbol]['instruction'] = 'NEWS_CLOSE'
         else:
             signals[symbol]['instruction'] = 'NEXT'
 
