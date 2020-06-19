@@ -34,6 +34,7 @@ def replace_in_file(file_path, str_search, str_replace):
 
 
 # Try to start all testers with their apropriate .ini files with the correct symbol and dates
+# https://www.mql5.com/en/forum/127577
 replace_in_file('portable mt4/nnfx_forward_backtester.ini',
                 '<EXPERT>', 'meow')
 
