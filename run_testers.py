@@ -1,4 +1,5 @@
 import subprocess
+import shlex
 
 
 forex_pairs = ["AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD", "CADCHF", "CADJPY", "CHFJPY", "EURCHF", "EURAUD", "EURCAD", "EURGBP", "EURJPY", "EURNZD", "EURUSD",
@@ -6,15 +7,20 @@ forex_pairs = ["AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD", "CADCHF", "CADJ
 
 benchmark_fx_pairs = ['EURUSD', 'AUDNZD', 'EURGBP', 'AUDCAD', 'CHFJPY']
 
-# for pair in benchmark_fx_pairs:
-#     subprocess.Popen(
-#         [f"C:\\Users\\Shaniel Samadhan\\Desktop\\NNFX FORWARD BACKTESTER\\testers\\{pair}\\terminal.exe", 'skipupdate', '/portable'])
-#     print(f'Opened {pair}')
+expert_name = 'NNFX FORWARD BACKTESTER'
+settings_setfile = 'nnfx_forward_backtester'
+timeframe = 'D1'
+start_date = '2017.01.01'
+end_date = '2021.01.01'
 
 
-# command = "cmd /C " & Chr(34) & Chr(34) & terminal_path & Chr(34) & " " & Chr(34) & data_dir_path & "tester\" & ini_file & ".ini" & Chr(34) & " / skipupdate" & Chr(34)
-# cmd /C ""C:\Program Files (x86)\MetaTrader 4 IC Markets\terminal.exe"
-# "C:\Users\Shaniel Samadhan\AppData\Roaming\MetaQuotes\Terminal\1DAFD9A7C67DC84FE37EAA1FC1E5CF75\tester\VPU Algo EURUSD 2017-2021.ini" /skipupdate"
+expert_token = "<EXPERT>"
+file_token = "<FILE>"
+symbol_token = "<SYMBOL>"
+timeframe_token = "<TIMEFRAME>"
+start_date_token = "<START_DATE>"
+end_date_token = "<END_DATE>"
+
 
 def replace_in_file(file_path, str_search, str_replace):
     # read input file
@@ -33,10 +39,23 @@ def replace_in_file(file_path, str_search, str_replace):
     fin.close()
 
 
-# Try to start all testers with their apropriate .ini files with the correct symbol and dates
-# https://www.mql5.com/en/forum/127577
-replace_in_file('portable mt4/nnfx_forward_backtester.ini',
-                '<EXPERT>', 'meow')
+for pair in benchmark_fx_pairs:
+    # change .ini file for every tester
+    path_to_ini_file = f'testers/{pair}/nnfx_forward_backtester.ini'
+    replace_in_file(path_to_ini_file, expert_token, expert_name)
+    replace_in_file(path_to_ini_file, file_token, settings_setfile)
+    replace_in_file(path_to_ini_file, symbol_token, pair)
+    replace_in_file(path_to_ini_file, timeframe_token, timeframe)
+    replace_in_file(path_to_ini_file, start_date_token, start_date)
+    replace_in_file(path_to_ini_file, end_date_token, end_date)
 
-replace_in_file('portable mt4/nnfx_forward_backtester.ini',
-                '<SYMBOL>', 'EURUSD')
+    # open tester with .ini file to run strategy tester automatically with above specified settings
+    path_to_tester = f"C:\\Users\\Shaniel Samadhan\\Desktop\\NNFX FORWARD BACKTESTER\\testers\\{pair}\\terminal.exe"
+    absolute_path_to_ini_file = f"C:\\Users\\Shaniel Samadhan\\Desktop\\NNFX FORWARD BACKTESTER\\testers\\{pair}\\nnfx_forward_backtester.ini"
+    command = f'"{path_to_tester}" "{absolute_path_to_ini_file}" /skipupdate /portable'
+    print(command)
+    subprocess.Popen(shlex.split(command))
+    print(f'Opened {pair}')
+
+
+# https://www.mql5.com/en/forum/127577

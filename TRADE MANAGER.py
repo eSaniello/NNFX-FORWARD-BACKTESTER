@@ -92,7 +92,7 @@ print("Waiting for clients to connect...")
 
 signals = {}
 clients = 0
-max_clients = 1
+max_clients = 5
 
 while True:
     try:
