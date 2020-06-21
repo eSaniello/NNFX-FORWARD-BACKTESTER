@@ -11,7 +11,7 @@ expert_name = 'NNFX FORWARD BACKTESTER'
 settings_setfile = 'nnfx_forward_backtester'
 timeframe = 'D1'
 start_date = '2017.01.01'
-end_date = '2021.01.01'
+end_date = '2020.01.01'
 
 
 expert_token = "<EXPERT>"
