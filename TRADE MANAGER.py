@@ -4,11 +4,11 @@ import sys
 import msvcrt
 import json
 from news import check_for_news
+import datetime
 
 context = zmq.Context()
 
 print("Starting Backward Forward Server")
-
 socket = context.socket(zmq.REP)
 pub = context.socket(zmq.PUB)
 
@@ -48,58 +48,20 @@ def decodeSignal(signal):
 
     return json_msg
 
-# step 1 for tonight. get this looping and telling the algo to take any trades it gets a signal for
-# read the first signals and build an array of all connected clients
-# on each loop, go through each client and send a trade signal if trade is set to true
-# array of python dictionrys?
-# lsit of dictionarys i guess
-
-# wait for first clients, loop indefinately until keypress
-#
-# do the first calculation for currency over exposure and send instructions
-#
-# then from then on, make sure we get signals from every client before moving forward
-#
-
-# testing MT4, maybe try to make 2 MT4 testers, that use windows file system links for expert directory - not sure how that will go for compiling and reseting the UI
-# might have to close and open second mt4 every time compile?? hopefully it just reads from HDD
-
-# Wait for clients
-# On keypress go forward (make a fixed number of clients to 2 for testing, so once it has 2 clients it will automatically move forward as well
-
-#
-# do while
-#
-#   Calulate news/currency exposure
-#
-#   Send instructions
-#
-#   Wait for next candle information
-#
-# client only has basic trade, news and skip functionality will be enough to get the following working
-# news system (database)
-# currency exposure
-#
-# Get basic loop sorted and working
-# test with multiple clients
-# then basic currency exposure system dack - race style
-# then database news system
-# Collect signals from all clients and store in a list of Dictionarys
-# maybe clicking stop on client - send message to python server to remove it from client list?
-
 
 print("Waiting for clients to connect...")
 
 signals = {}
 clients = 0
-max_clients = 4
+max_clients = 2
 
+# TODO: Make sure all testers are on same date!
+dates = {}
+in_sync = False
 while True:
     try:
-        # messagge format: symbol:'AUDUSD',date:'2020-04-01',atr:'209.15',trade1:'0',trade2:'0',signal:'0'
         signal = socket.recv_string(zmq.NOBLOCK)
 
-        # TODO: maybe some form of validation, if not valid send 'retry'
         signal = decodeSignal(signal)
 
         if signal['symbol'] not in signals:
@@ -125,9 +87,43 @@ print("Total of", len(signals), "clients connected...")
 print()
 print("Starting backtest:")
 
-# TODO: would check here that all clients are on the same candle, otherwise syncronise them
+
+def checkEqual1(iterator):
+    iterator = iter(iterator)
+    try:
+        first = next(iterator)
+    except StopIteration:
+        return True
+    return all(first == rest for rest in iterator)
+
 
 while True:
+    for symbol in signals:
+        current_date = datetime.datetime.strptime(
+            signals[symbol]['date'], '%Y.%m.%d %H:%M:%S')
+
+        dates[symbol] = current_date
+
+    if len(dates) > 0:
+        # result = all(elem == dates[0] for elem in dates)
+        result = checkEqual1(dates)
+    if result:
+        print("All Elements in List are Equal")
+    else:
+        print("All Elements in List are Not Equal")
+
+        now = datetime.datetime.now()
+        youngest = max(dt for dt in dates.values() if dt < now)
+
+        print('testers not in sync')
+        # go to next candle
+        for symbol in signals:
+            if signals[symbol]['date'] != youngest:
+                signals[symbol]['instruction'] = 'NEXT'
+                pub.send_string(f"{symbol} {signals[symbol]['instruction']}")
+
+
+while in_sync:
     # loop through signals array, checking signals, for now add instruction key to each (next, trade, news) that just tells them to trade if signal and next if none
 
     # sum up exposure of existing trades
