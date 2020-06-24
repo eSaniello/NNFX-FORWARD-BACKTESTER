@@ -32,6 +32,15 @@ def kbfunc():
     return ret
 
 
+def checkEqual1(iterator):
+    iterator = iter(iterator)
+    try:
+        first = next(iterator)
+    except StopIteration:
+        return True
+    return all(first == rest for rest in iterator)
+
+
 def decodeSignal(signal):
     json_msg = json.loads(signal)
     # atr = int(json_msg['atr'])
@@ -53,11 +62,11 @@ print("Waiting for clients to connect...")
 
 signals = {}
 clients = 0
-max_clients = 2
+max_clients = 5
 
 # TODO: Make sure all testers are on same date!
 dates = {}
-in_sync = False
+
 while True:
     try:
         signal = socket.recv_string(zmq.NOBLOCK)
@@ -71,6 +80,31 @@ while True:
 
         # Ok we have decoded the signal, tell the client we are done for now
         socket.send_string("OK")
+
+# #################################################################################
+        # for symbol in signals:
+        #     current_date = datetime.datetime.strptime(
+        #         signals[symbol]['date'], '%Y.%m.%d %H:%M:%S')
+
+        #     dates[symbol] = current_date
+
+        # if len(dates) > 0:
+        #     result = checkEqual1(dates)
+        # if result == False:
+        #     now = datetime.datetime.now()
+        #     youngest = max(dt for dt in dates.values() if dt < now)
+
+        #     print('Testers not in sync')
+        #     # go to next candle
+        #     for symbol in signals:
+        #         _date = datetime.datetime.strptime(
+        #             signals[symbol]['date'], '%Y.%m.%d %H:%M:%S')
+
+        #         if _date != youngest:
+        #             signals[symbol]['instruction'] = 'NEXT'
+        #             pub.send_string(
+        #                 f"{symbol} {signals[symbol]['instruction']}")
+# #############################################################################################
 
         # TODO: remove this for proper testing
         # break out of loop once we have more than 1 client for testing purposes
@@ -88,42 +122,7 @@ print()
 print("Starting backtest:")
 
 
-def checkEqual1(iterator):
-    iterator = iter(iterator)
-    try:
-        first = next(iterator)
-    except StopIteration:
-        return True
-    return all(first == rest for rest in iterator)
-
-
 while True:
-    for symbol in signals:
-        current_date = datetime.datetime.strptime(
-            signals[symbol]['date'], '%Y.%m.%d %H:%M:%S')
-
-        dates[symbol] = current_date
-
-    if len(dates) > 0:
-        # result = all(elem == dates[0] for elem in dates)
-        result = checkEqual1(dates)
-    if result:
-        print("All Elements in List are Equal")
-    else:
-        print("All Elements in List are Not Equal")
-
-        now = datetime.datetime.now()
-        youngest = max(dt for dt in dates.values() if dt < now)
-
-        print('testers not in sync')
-        # go to next candle
-        for symbol in signals:
-            if signals[symbol]['date'] != youngest:
-                signals[symbol]['instruction'] = 'NEXT'
-                pub.send_string(f"{symbol} {signals[symbol]['instruction']}")
-
-
-while in_sync:
     # loop through signals array, checking signals, for now add instruction key to each (next, trade, news) that just tells them to trade if signal and next if none
 
     # sum up exposure of existing trades
@@ -247,6 +246,31 @@ while in_sync:
 
             # Ok we have decoded the signal, tell the client we are done for now
             socket.send_string("OK")
+
+    # #################################################################################
+            # for symbol in signals:
+            #     current_date = datetime.datetime.strptime(
+            #         signals[symbol]['date'], '%Y.%m.%d %H:%M:%S')
+
+            #     dates[symbol] = current_date
+
+            # if len(dates) > 0:
+            #     result = checkEqual1(dates)
+            # if result == False:
+            #     now = datetime.datetime.now()
+            #     youngest = max(dt for dt in dates.values() if dt < now)
+
+            #     print('Testers not in sync')
+            #     # go to next candle
+            #     for symbol in signals:
+            #         _date = datetime.datetime.strptime(
+            #             signals[symbol]['date'], '%Y.%m.%d %H:%M:%S')
+
+            #         if _date != youngest:
+            #             signals[symbol]['instruction'] = 'NEXT'
+            #             pub.send_string(
+            #                 f"{symbol} {signals[symbol]['instruction']}")
+    # #############################################################################################
 
             # break out of loop once we have signals from every client
             if len(signals) == clients:
