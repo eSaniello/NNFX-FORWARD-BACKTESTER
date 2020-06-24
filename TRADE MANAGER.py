@@ -3,8 +3,9 @@ import time
 import sys
 import msvcrt
 import json
-from news import check_for_news
 import datetime
+from news import check_for_news
+from evz import check_evz
 
 context = zmq.Context()
 
@@ -63,8 +64,10 @@ print("Waiting for clients to connect...")
 signals = {}
 clients = 0
 max_clients = 5
+evz_treshold = 7
+news_avoidance = True
+evz_avoidance = True
 
-# TODO: Make sure all testers are on same date!
 dates = {}
 
 while True:
@@ -130,14 +133,12 @@ while True:
     # exposure['USD'][S] = trade1 + trade2
     #
     # then to check exposure, check if current exposure + 2 <= 2...
-    # need to change EA to send direction of trade (maybe just put long/flat/short in trade1 and trade2 for now then change to risk percent later
     #
     # trade 1 and 2 are just from OrderType call in mt4, so -1 none, 1 SHORT, 0 LONG
     #
     # long means long on first cur, short on second
     exposure = {}
 
-    # TODO: change this to use 2 varliables, shortExposure and longExposure dont really need anything this fancy
     for symbol, signal in signals.items():
         for trade in ['trade1', 'trade2']:
             base = symbol[0:3]
@@ -169,11 +170,12 @@ while True:
 
     # this will just be a race to whos first, need to sort signals buy an order at some stage
 
-    # TODO: NEWS
+    # NEWS
     # If there is then don't trade
     # If in a losing trade then exit
     # if the first trade hit tp then do nothing
 
+    evz = False
     for symbol in signals:
         trade = False
         _long = False
@@ -185,34 +187,47 @@ while True:
         base = symbol[0:3]
         quote = symbol[3:6]
 
-        # check for upcomming news events
-        news = check_for_news(
-            24, signals[symbol]['date'], symbol, base, quote, False)
-
-        if news == True:
-            if signals[symbol]['trade1'] == -1 and signals[symbol]['trade1'] != -1:
-                close_trades = False
+        # check $EVZ value and if it's above the treshold
+        if not evz and evz_avoidance:
+            evz_val = check_evz(signals[symbol]['date'])
+            if evz_val == 0 or evz_val >= evz_treshold:
+                evz = True
+                print(f'$EVZ value: {evz_val}')
             else:
-                close_trades = True
+                print(f'$EVZ too low: {evz_val}')
+
+        # check for upcomming news events
+        if news_avoidance:
+            news = check_for_news(
+                24, signals[symbol]['date'], symbol, base, quote, False)
+
+            if news == True:
+                if signals[symbol]['trade1'] == -1 and signals[symbol]['trade1'] != -1:
+                    close_trades = False
+                else:
+                    close_trades = True
 
         if int(signals[symbol]['signal']) > 0:
             if not close_trades:
-                if int(signals[symbol]['signal']) == 1:  # LONG
-                    if exposure[base]['LONG'] == 0 and exposure[quote]['SHORT'] == 0:
-                        # take the trade and set it to full exposure
-                        trade = True
-                        _long = True
-                        _short = False
-                        exposure[base]['LONG'] = 2
-                        exposure[quote]['SHORT'] = 2
-                elif int(signals[symbol]['signal']) == 2:  # SHORT
-                    if exposure[base]['SHORT'] == 0 and quote in exposure and exposure[quote]['LONG'] == 0:
-                        # take the trade and set it to full exposure
-                        trade = True
-                        _long = False
-                        _short = True
-                        exposure[base]['SHORT'] = 2
-                        exposure[quote]['LONG'] = 2
+                if not evz_avoidance:
+                    evz = True
+                    if evz:
+                        if int(signals[symbol]['signal']) == 1:  # LONG
+                            if exposure[base]['LONG'] == 0 and exposure[quote]['SHORT'] == 0:
+                                # take the trade and set it to full exposure
+                                trade = True
+                                _long = True
+                                _short = False
+                                exposure[base]['LONG'] = 2
+                                exposure[quote]['SHORT'] = 2
+                        elif int(signals[symbol]['signal']) == 2:  # SHORT
+                            if exposure[base]['SHORT'] == 0 and quote in exposure and exposure[quote]['LONG'] == 0:
+                                # take the trade and set it to full exposure
+                                trade = True
+                                _long = False
+                                _short = True
+                                exposure[base]['SHORT'] = 2
+                                exposure[quote]['LONG'] = 2
 
             if not trade:
                 print(f" **** CURRENCY EXPOSURE ON {symbol} *** ")

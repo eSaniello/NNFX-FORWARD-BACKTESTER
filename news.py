@@ -36,7 +36,7 @@ def check_for_news(hours, date, symbol, base, quote, high_impact_only=False):
     next_day = datetime.strptime(
         current_date, '%Y-%m-%d %H:%M:%S') + timedelta(hours=hours)
 
-    con = create_connection(r"db\news.db")
+    con = create_connection(r"db\forward_backtester.db")
     cur = con.cursor()
     cur.execute("SELECT * FROM news where date >= ?and date <= ?",
                 (current_date, next_day))
@@ -129,7 +129,3 @@ def check_for_news(hours, date, symbol, base, quote, high_impact_only=False):
     return False
     con.commit()
     con.close()
-
-
-# if __name__ == '__main__':
-#     check_for_news(24, '2020.06.15 23:59:59', 'EURUSD', 'EUR', 'USD', True)
