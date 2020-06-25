@@ -2,19 +2,6 @@ import subprocess
 import shlex
 
 
-forex_pairs = ["AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD", "CADCHF", "CADJPY", "CHFJPY", "EURCHF", "EURAUD", "EURCAD", "EURGBP", "EURJPY", "EURNZD", "EURUSD",
-               "GBPAUD", "GBPCAD", "GBPCHF", "GBPJPY", "GBPNZD", "GBPUSD", "NZDCHF", "NZDCAD", "NZDJPY", "NZDUSD", "USDCAD", "USDCHF", "USDJPY"]
-
-benchmark_fx_pairs = ['EURUSD', 'AUDNZD', 'EURGBP', 'AUDCAD', 'CHFJPY']
-
-expert_name = 'NNFX FORWARD BACKTESTER'
-settings_setfile = 'nnfx_forward_backtester'
-timeframe = 'D1'
-start_date = '2017.01.01'
-end_date = '2021.01.01'
-spread = '5'  # 0 = use current spread
-
-
 expert_token = "<EXPERT>"
 file_token = "<FILE>"
 symbol_token = "<SYMBOL>"
@@ -41,24 +28,25 @@ def replace_in_file(file_path, str_search, str_replace):
     fin.close()
 
 
-for pair in benchmark_fx_pairs:
-    # change .ini file for every tester
-    path_to_ini_file = f'testers/{pair}/nnfx_forward_backtester.ini'
-    replace_in_file(path_to_ini_file, expert_token, expert_name)
-    replace_in_file(path_to_ini_file, file_token, settings_setfile)
-    replace_in_file(path_to_ini_file, symbol_token, pair)
-    replace_in_file(path_to_ini_file, timeframe_token, timeframe)
-    replace_in_file(path_to_ini_file, spread_token, spread)
-    replace_in_file(path_to_ini_file, start_date_token, start_date)
-    replace_in_file(path_to_ini_file, end_date_token, end_date)
+def run_testers(pairs, _expert_name, _settings_setfile, _timeframe, _spread, _start_date, _end_date):
+    for pair in pairs:
+        # change .ini file for every tester
+        path_to_ini_file = f'testers/{pair}/nnfx_forward_backtester.ini'
+        replace_in_file(path_to_ini_file, expert_token, _expert_name)
+        replace_in_file(path_to_ini_file, file_token, _settings_setfile)
+        replace_in_file(path_to_ini_file, symbol_token, pair)
+        replace_in_file(path_to_ini_file, timeframe_token, _timeframe)
+        replace_in_file(path_to_ini_file, spread_token, _spread)
+        replace_in_file(path_to_ini_file, start_date_token, _start_date)
+        replace_in_file(path_to_ini_file, end_date_token, _end_date)
 
-    # open tester with .ini file to run strategy tester automatically with above specified settings
-    path_to_tester = f"C:\\Users\\Shaniel Samadhan\\Desktop\\NNFX FORWARD BACKTESTER\\testers\\{pair}\\terminal.exe"
-    absolute_path_to_ini_file = f"C:\\Users\\Shaniel Samadhan\\Desktop\\NNFX FORWARD BACKTESTER\\testers\\{pair}\\nnfx_forward_backtester.ini"
-    command = f'"{path_to_tester}" "{absolute_path_to_ini_file}" /skipupdate /portable'
-    print(command)
-    subprocess.Popen(shlex.split(command))
-    print(f'Opened {pair}')
+        # open tester with .ini file to run strategy tester automatically with above specified settings
+        path_to_tester = f"C:\\Users\\Shaniel Samadhan\\Desktop\\NNFX FORWARD BACKTESTER\\testers\\{pair}\\terminal.exe"
+        absolute_path_to_ini_file = f"C:\\Users\\Shaniel Samadhan\\Desktop\\NNFX FORWARD BACKTESTER\\testers\\{pair}\\nnfx_forward_backtester.ini"
+        command = f'"{path_to_tester}" "{absolute_path_to_ini_file}" /skipupdate /portable'
+        # print(command)
+        subprocess.Popen(shlex.split(command))
+        print(f'Started {pair}')
 
 
 # https://www.mql5.com/en/forum/127577

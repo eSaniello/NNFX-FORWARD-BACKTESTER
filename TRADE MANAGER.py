@@ -6,10 +6,38 @@ import json
 import datetime
 from news import check_for_news
 from evz import check_evz
+from copy_indi_and_ea import copy_files_to_testers
+from run_testers import run_testers
+
+print("STARTING BACKWARD FORWARD SERVER\n")
+# SETTINGS
+max_clients = 5
+evz_treshold = 3
+news_avoidance = True
+evz_avoidance = True
+
+expert_name = 'NNFX FORWARD BACKTESTER'
+settings_setfile = 'nnfx_forward_backtester'
+timeframe = 'D1'  # M1, M5, M15, M30, H1, H4, D1, W1, MN
+start_date = '2020.01.01'
+end_date = '2021.01.01'
+spread = '5'  # 0 = use current spread
+
+forex_pairs = ["AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD", "CADCHF", "CADJPY", "CHFJPY", "EURCHF", "EURAUD", "EURCAD", "EURGBP", "EURJPY", "EURNZD", "EURUSD",
+               "GBPAUD", "GBPCAD", "GBPCHF", "GBPJPY", "GBPNZD", "GBPUSD", "NZDCHF", "NZDCAD", "NZDJPY", "NZDUSD", "USDCAD", "USDCHF", "USDJPY"]
+
+benchmark_fx_pairs = ['EURUSD', 'AUDNZD', 'EURGBP', 'AUDCAD', 'CHFJPY']
+
+# copy all the files to the testers first
+print('Copying all the necesarry files to all the testers...')
+copy_files_to_testers(forex_pairs)
+
+# run all the testers
+print('\nStarting all clients...')
+run_testers(pairs=benchmark_fx_pairs, _expert_name=expert_name, _settings_setfile=settings_setfile,
+            _timeframe=timeframe, _spread=spread, _start_date=start_date, _end_date=end_date)
 
 context = zmq.Context()
-
-print("Starting Backward Forward Server")
 socket = context.socket(zmq.REP)
 pub = context.socket(zmq.PUB)
 
@@ -59,17 +87,10 @@ def decodeSignal(signal):
     return json_msg
 
 
-print("Waiting for clients to connect...")
-
+print("\nWaiting for clients to connect...")
 signals = {}
 clients = 0
-max_clients = 5
-evz_treshold = 7
-news_avoidance = True
-evz_avoidance = True
-
-dates = {}
-
+# dates = {}
 while True:
     try:
         signal = socket.recv_string(zmq.NOBLOCK)
@@ -120,7 +141,7 @@ while True:
         if kbfunc() != -1:  # poll keyboard for ctrl-z to exit (or move on to testing)
             break
 
-print("Total of", len(signals), "clients connected...")
+print("Total of", len(signals), "clients connected")
 print()
 print("Starting backtest:")
 
@@ -176,6 +197,7 @@ while True:
     # if the first trade hit tp then do nothing
 
     evz = False
+    evz_msg = True
     for symbol in signals:
         trade = False
         _long = False
@@ -194,7 +216,9 @@ while True:
                 evz = True
                 print(f'$EVZ value: {evz_val}')
             else:
-                print(f'$EVZ too low: {evz_val}')
+                if evz_msg:
+                    evz_msg = False
+                    print(f'$EVZ too low: {evz_val}')
 
         # check for upcomming news events
         if news_avoidance:
@@ -229,8 +253,8 @@ while True:
                                 exposure[base]['SHORT'] = 2
                                 exposure[quote]['LONG'] = 2
 
-            if not trade:
-                print(f" **** CURRENCY EXPOSURE ON {symbol} *** ")
+                    if not trade:
+                        print(f" **** CURRENCY EXPOSURE ON {symbol} *** ")
 
         if trade:
             if _long:
