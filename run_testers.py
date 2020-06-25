@@ -12,6 +12,7 @@ settings_setfile = 'nnfx_forward_backtester'
 timeframe = 'D1'
 start_date = '2017.01.01'
 end_date = '2021.01.01'
+spread = '5'  # 0 = use current spread
 
 
 expert_token = "<EXPERT>"
@@ -20,6 +21,7 @@ symbol_token = "<SYMBOL>"
 timeframe_token = "<TIMEFRAME>"
 start_date_token = "<START_DATE>"
 end_date_token = "<END_DATE>"
+spread_token = "<SPREAD>"
 
 
 def replace_in_file(file_path, str_search, str_replace):
@@ -46,6 +48,7 @@ for pair in benchmark_fx_pairs:
     replace_in_file(path_to_ini_file, file_token, settings_setfile)
     replace_in_file(path_to_ini_file, symbol_token, pair)
     replace_in_file(path_to_ini_file, timeframe_token, timeframe)
+    replace_in_file(path_to_ini_file, spread_token, spread)
     replace_in_file(path_to_ini_file, start_date_token, start_date)
     replace_in_file(path_to_ini_file, end_date_token, end_date)
 
