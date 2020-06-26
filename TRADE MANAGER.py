@@ -9,6 +9,8 @@ from evz import check_evz
 from copy_indi_and_ea import copy_files_to_testers
 from run_testers import run_testers
 
+# https://docs.mql4.com/trading/orderselect
+
 print("STARTING BACKWARD FORWARD SERVER\n")
 # SETTINGS
 max_clients = 5
