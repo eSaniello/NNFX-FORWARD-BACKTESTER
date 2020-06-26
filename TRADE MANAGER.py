@@ -20,7 +20,7 @@ expert_name = 'NNFX FORWARD BACKTESTER'
 settings_setfile = 'nnfx_forward_backtester'
 timeframe = 'D1'  # M1, M5, M15, M30, H1, H4, D1, W1, MN
 start_date = '2020.01.01'
-end_date = '2021.01.01'
+end_date = '2020.01.06'
 spread = '5'  # 0 = use current spread
 
 forex_pairs = ["AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD", "CADCHF", "CADJPY", "CHFJPY", "EURCHF", "EURAUD", "EURCAD", "EURGBP", "EURJPY", "EURNZD", "EURUSD",
@@ -77,12 +77,14 @@ def decodeSignal(signal):
     trade2 = int(json_msg['trade2'])
     _signal = int(json_msg['signal'])
     open_orders = int(json_msg['open_orders'])
+    finished = True if json_msg['finished'] == 'true' else False
 
     # json_msg['atr'] = atr
     json_msg['trade1'] = trade1
     json_msg['trade2'] = trade2
     json_msg['signal'] = _signal
     json_msg['open_orders'] = open_orders
+    json_msg['finished'] = finished
 
     return json_msg
 
@@ -320,4 +322,11 @@ while True:
         except zmq.error.Again:
             time.sleep(.001)
 
-print(signals)
+    counter = 0
+    for symbol in signals:
+        if signals[symbol]['finished'] == True:
+            counter += 1
+
+        if counter >= clients:
+            print('\nFINISHED')
+            exit()
