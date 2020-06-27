@@ -5,6 +5,7 @@ import msvcrt
 import json
 import datetime
 import csv
+import os
 from news import check_for_news
 from evz import check_evz
 from copy_indi_and_ea import copy_files_to_testers
@@ -14,10 +15,8 @@ from run_testers import run_testers
 
 print("STARTING BACKWARD FORWARD SERVER\n")
 # SETTINGS
-max_clients = 1
 evz_treshold = 3
 news_avoidance = True
-
 expert_name = 'NNFX FORWARD BACKTESTER'
 settings_setfile = 'nnfx_forward_backtester'
 timeframe = 'D1'  # M1, M5, M15, M30, H1, H4, D1, W1, MN
@@ -32,13 +31,16 @@ benchmark_fx_pairs = ['EURUSD', 'AUDNZD', 'EURGBP', 'AUDCAD', 'CHFJPY']
 
 dummy_pairs = ['EURUSD']
 
+pairs_to_use = benchmark_fx_pairs
+max_clients = len(pairs_to_use)
+
 # copy all the files to the testers first
 print('Copying all the necesarry files to all the testers...')
 copy_files_to_testers(forex_pairs)
 
 # run all the testers
 print('\nStarting all clients...')
-run_testers(pairs=dummy_pairs, _expert_name=expert_name, _settings_setfile=settings_setfile,
+run_testers(pairs=pairs_to_use, _expert_name=expert_name, _settings_setfile=settings_setfile,
             _timeframe=timeframe, _spread=spread, _start_date=start_date, _end_date=end_date)
 
 context = zmq.Context()
@@ -90,12 +92,14 @@ def decodeSignal(signal):
     json_msg['open_orders'] = open_orders
     json_msg['finished'] = finished
 
+    # create csv files with trade history
     if 'history' in json_msg:
         arr = json_msg['history'].split('  ')
         reader = csv.reader(arr)
         parsed_csv = list(reader)
 
-        with open(r'reports\data.csv', 'w', newline='') as file:
+        path = 'reports/' + json_msg['symbol'] + '.csv'
+        with open(path, 'w', newline='') as file:
             writer = csv.writer(file)
             writer.writerows(parsed_csv)
 
