@@ -13,15 +13,14 @@ from run_testers import run_testers
 
 print("STARTING BACKWARD FORWARD SERVER\n")
 # SETTINGS
-max_clients = 5
+max_clients = 1
 evz_treshold = 3
 news_avoidance = True
-evz_avoidance = True
 
 expert_name = 'NNFX FORWARD BACKTESTER'
 settings_setfile = 'nnfx_forward_backtester'
 timeframe = 'D1'  # M1, M5, M15, M30, H1, H4, D1, W1, MN
-start_date = '2020.01.01'
+start_date = '2019.01.01'
 end_date = '2020.01.06'
 spread = '5'  # 0 = use current spread
 
@@ -30,13 +29,15 @@ forex_pairs = ["AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD", "CADCHF", "CADJ
 
 benchmark_fx_pairs = ['EURUSD', 'AUDNZD', 'EURGBP', 'AUDCAD', 'CHFJPY']
 
+dummy_pairs = ['EURUSD']
+
 # copy all the files to the testers first
 print('Copying all the necesarry files to all the testers...')
 copy_files_to_testers(forex_pairs)
 
 # run all the testers
 print('\nStarting all clients...')
-run_testers(pairs=benchmark_fx_pairs, _expert_name=expert_name, _settings_setfile=settings_setfile,
+run_testers(pairs=dummy_pairs, _expert_name=expert_name, _settings_setfile=settings_setfile,
             _timeframe=timeframe, _spread=spread, _start_date=start_date, _end_date=end_date)
 
 context = zmq.Context()
@@ -214,7 +215,7 @@ while True:
         quote = symbol[3:6]
 
         # check $EVZ value and if it's above the treshold
-        if not evz and evz_avoidance:
+        if not evz:
             evz_val = check_evz(signals[symbol]['date'])
             if evz_val == 0 or evz_val >= evz_treshold:
                 evz = True
@@ -237,28 +238,26 @@ while True:
 
         if int(signals[symbol]['signal']) > 0:
             if not close_trades:
-                if not evz_avoidance:
-                    evz = True
-                    if evz:
-                        if int(signals[symbol]['signal']) == 1:  # LONG
-                            if exposure[base]['LONG'] == 0 and exposure[quote]['SHORT'] == 0:
-                                # take the trade and set it to full exposure
-                                trade = True
-                                _long = True
-                                _short = False
-                                exposure[base]['LONG'] = 2
-                                exposure[quote]['SHORT'] = 2
-                        elif int(signals[symbol]['signal']) == 2:  # SHORT
-                            if exposure[base]['SHORT'] == 0 and quote in exposure and exposure[quote]['LONG'] == 0:
-                                # take the trade and set it to full exposure
-                                trade = True
-                                _long = False
-                                _short = True
-                                exposure[base]['SHORT'] = 2
-                                exposure[quote]['LONG'] = 2
+                if evz:
+                    if int(signals[symbol]['signal']) == 1:  # LONG
+                        if exposure[base]['LONG'] == 0 and exposure[quote]['SHORT'] == 0:
+                            # take the trade and set it to full exposure
+                            trade = True
+                            _long = True
+                            _short = False
+                            exposure[base]['LONG'] = 2
+                            exposure[quote]['SHORT'] = 2
+                    elif int(signals[symbol]['signal']) == 2:  # SHORT
+                        if exposure[base]['SHORT'] == 0 and quote in exposure and exposure[quote]['LONG'] == 0:
+                            # take the trade and set it to full exposure
+                            trade = True
+                            _long = False
+                            _short = True
+                            exposure[base]['SHORT'] = 2
+                            exposure[quote]['LONG'] = 2
 
-                    if not trade:
-                        print(f" **** CURRENCY EXPOSURE ON {symbol} *** ")
+                if not trade:
+                    print(f" **** CURRENCY EXPOSURE ON {symbol} *** ")
 
         if trade:
             if _long:
