@@ -4,6 +4,7 @@ import sys
 import msvcrt
 import json
 import datetime
+import csv
 from news import check_for_news
 from evz import check_evz
 from copy_indi_and_ea import copy_files_to_testers
@@ -88,6 +89,15 @@ def decodeSignal(signal):
     json_msg['signal'] = _signal
     json_msg['open_orders'] = open_orders
     json_msg['finished'] = finished
+
+    if 'history' in json_msg:
+        arr = json_msg['history'].split('  ')
+        reader = csv.reader(arr)
+        parsed_csv = list(reader)
+
+        with open(r'reports\data.csv', 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerows(parsed_csv)
 
     return json_msg
 
