@@ -5,7 +5,6 @@ import msvcrt
 import json
 import datetime
 import csv
-import os
 from news import check_for_news
 from evz import check_evz
 from copy_indi_and_ea import copy_files_to_testers
@@ -31,7 +30,7 @@ benchmark_fx_pairs = ['EURUSD', 'AUDNZD', 'EURGBP', 'AUDCAD', 'CHFJPY']
 
 dummy_pairs = ['EURUSD']
 
-pairs_to_use = benchmark_fx_pairs
+pairs_to_use = dummy_pairs
 max_clients = len(pairs_to_use)
 
 # copy all the files to the testers first
