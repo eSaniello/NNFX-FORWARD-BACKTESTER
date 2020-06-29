@@ -9,6 +9,8 @@ from news import check_for_news
 from evz import check_evz
 from copy_indi_and_ea import copy_files_to_testers
 from run_testers import run_testers
+from stats import decodeHistory
+from stats import decodeStats
 
 # https://docs.mql4.com/trading/orderselect
 
@@ -30,7 +32,8 @@ benchmark_fx_pairs = ['EURUSD', 'AUDNZD', 'EURGBP', 'AUDCAD', 'CHFJPY']
 
 dummy_pairs = ['EURUSD']
 
-pairs_to_use = dummy_pairs
+pairs_to_use = benchmark_fx_pairs
+
 max_clients = len(pairs_to_use)
 
 # copy all the files to the testers first
@@ -77,30 +80,17 @@ def checkEqual1(iterator):
 
 def decodeSignal(signal):
     json_msg = json.loads(signal)
-    # atr = int(json_msg['atr'])
     trade1 = int(json_msg['trade1'])
     trade2 = int(json_msg['trade2'])
     _signal = int(json_msg['signal'])
     open_orders = int(json_msg['open_orders'])
     finished = True if json_msg['finished'] == 'true' else False
 
-    # json_msg['atr'] = atr
     json_msg['trade1'] = trade1
     json_msg['trade2'] = trade2
     json_msg['signal'] = _signal
     json_msg['open_orders'] = open_orders
     json_msg['finished'] = finished
-
-    # create csv files with trade history
-    if 'history' in json_msg:
-        arr = json_msg['history'].split('  ')
-        reader = csv.reader(arr)
-        parsed_csv = list(reader)
-
-        path = 'reports/' + json_msg['symbol'] + '.csv'
-        with open(path, 'w', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerows(parsed_csv)
 
     return json_msg
 
@@ -108,6 +98,8 @@ def decodeSignal(signal):
 print("\nWaiting for clients to connect...")
 signals = {}
 clients = 0
+history = []
+stats = {}
 # dates = {}
 while True:
     try:
@@ -326,6 +318,23 @@ while True:
             #             pub.send_string(
             #                 f"{symbol} {signals[symbol]['instruction']}")
     # #############################################################################################
+
+            # Put all trades in an array
+            if(signals[signal['symbol']]['order1'] != 0):
+                if(signals[signal['symbol']]['order1'] not in history):
+                    trade = decodeHistory(signals[signal['symbol']]['order1'])
+                    history.append(trade)
+
+            if(signals[signal['symbol']]['order2'] != 0):
+                if(signals[signal['symbol']]['order2'] not in history):
+                    trade = decodeHistory(signals[signal['symbol']]['order2'])
+                    history.append(trade)
+
+            # put all the stats in an array
+            if(signals[signal['symbol']]['stats'] != 0):
+                if(signal['symbol'] not in stats):
+                    stat = decodeStats(signals[signal['symbol']]['stats'])
+                    stats[signal['symbol']] = stat
 
             # break out of loop once we have signals from every client
             if len(signals) == clients:
