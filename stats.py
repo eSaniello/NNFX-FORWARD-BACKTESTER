@@ -1,23 +1,46 @@
-import pandas as pd
-import glob
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
-
-# path = r'reports'  # use your path
-# all_files = glob.glob(path + "/*.csv")
-
-# li = []
-
-# for filename in all_files:
-#     df = pd.read_csv(filename, header=0)
-#     li.append(df)
-
-# history = pd.concat(li, axis=0, ignore_index=True)
-# print(history.sum())
-
-# df = pd.read_csv('reports/EURUSD.csv', header=0)
-# print(df)
 
 # https://docs.mql4.com/constants/environment_state/statistics#enum_statistics
+
+def calculateStats(stats, trades, pairs, _start_date, _end_date):
+    start_date = datetime.strptime(_start_date, '%Y.%m.%d')
+    end_date = datetime.strptime(_end_date, '%Y.%m.%d')
+    initial_balance = stats[pairs[0]]["STAT_INITIAL_DEPOSIT"]
+    total_net_profit = 0
+    averag_winrate = 0
+    total_gross_profit = 0
+    total_gross_loss = 0
+    profit_factor = 0
+    annual_roi = 0
+    total_return = 0
+
+    print('=====STATS=====')
+    print(f'Start date: {_start_date}')
+    print(f'End date: {_end_date}')
+    print(f'Initial balance: {initial_balance}')
+
+    for symbol in pairs:
+        total_net_profit += stats[symbol]['STAT_PROFIT']
+        averag_winrate += stats[symbol]['STAT_WINRATE']
+        total_gross_profit += stats[symbol]['STAT_GROSS_PROFIT']
+        total_gross_loss += stats[symbol]['STAT_GROSS_LOSS']
+
+    averag_winrate = averag_winrate / len(pairs)
+    profit_factor = (total_gross_profit / (total_gross_loss * -1))
+    date_diff = relativedelta(end_date, start_date)
+    annual_roi = (total_net_profit / (date_diff.years) / initial_balance) * 100
+    total_return = (total_net_profit / initial_balance) * 100
+    print(f'Total net profit: {round(total_net_profit, 2)}')
+    print(f'Average winrate: {round(averag_winrate, 2)}%')
+    print(f'Total gross profit: {round(total_gross_profit, 2)}')
+    print(f'Total gross loss: {round(total_gross_loss, 2)}')
+    print(f'Profit factor: {round(profit_factor, 2)}')
+    print(
+        f'Annual ROI (%): {round(annual_roi, 2) if date_diff.years > 0 else "-"}%')
+    print(f'Total ROI (%): {round(total_return, 2)}')
+
 
 def decodeHistory(_trade):
     trade = _trade
@@ -54,6 +77,7 @@ def decodeStats(_stats):
 
     stats['STAT_INITIAL_DEPOSIT'] = float(stats['STAT_INITIAL_DEPOSIT'])
     stats['STAT_PROFIT'] = float(stats['STAT_PROFIT'])
+    stats['STAT_WINRATE'] = float(stats['STAT_WINRATE'])
     stats['STAT_GROSS_PROFIT'] = float(stats['STAT_GROSS_PROFIT'])
     stats['STAT_GROSS_LOSS'] = float(stats['STAT_GROSS_LOSS'])
     stats['STAT_MAX_PROFITTRADE'] = float(stats['STAT_MAX_PROFITTRADE'])
@@ -62,12 +86,12 @@ def decodeStats(_stats):
     stats['STAT_CONPROFITMAX_TRADES'] = float(
         stats['STAT_CONPROFITMAX_TRADES'])
     stats['STAT_MAX_CONWINS'] = float(stats['STAT_MAX_CONWINS'])
-    stats['STAT_MAX_CONPROFIT_TRADES'] = float(
+    stats['STAT_MAX_CONPROFIT_TRADES'] = int(
         stats['STAT_MAX_CONPROFIT_TRADES'])
     stats['STAT_CONLOSSMAX'] = float(stats['STAT_CONLOSSMAX'])
-    stats['STAT_CONLOSSMAX_TRADES'] = float(stats['STAT_CONLOSSMAX_TRADES'])
+    stats['STAT_CONLOSSMAX_TRADES'] = int(stats['STAT_CONLOSSMAX_TRADES'])
     stats['STAT_MAX_CONLOSSES'] = float(stats['STAT_MAX_CONLOSSES'])
-    stats['STAT_MAX_CONLOSS_TRADES'] = float(stats['STAT_MAX_CONLOSS_TRADES'])
+    stats['STAT_MAX_CONLOSS_TRADES'] = int(stats['STAT_MAX_CONLOSS_TRADES'])
     stats['STAT_BALANCEMIN'] = float(stats['STAT_BALANCEMIN'])
     stats['STAT_BALANCE_DD'] = float(stats['STAT_BALANCE_DD'])
     stats['STAT_BALANCEDD_PERCENT'] = float(stats['STAT_BALANCEDD_PERCENT'])
@@ -84,15 +108,15 @@ def decodeStats(_stats):
     stats['STAT_EXPECTED_PAYOFF'] = float(stats['STAT_EXPECTED_PAYOFF'])
     stats['STAT_PROFIT_FACTOR'] = float(stats['STAT_PROFIT_FACTOR'])
     stats['STAT_MIN_MARGINLEVEL'] = float(stats['STAT_MIN_MARGINLEVEL'])
-    stats['STAT_TRADES'] = float(stats['STAT_TRADES'])
-    stats['STAT_PROFIT_TRADES'] = float(stats['STAT_PROFIT_TRADES'])
-    stats['STAT_LOSS_TRADES'] = float(stats['STAT_LOSS_TRADES'])
-    stats['STAT_SHORT_TRADES'] = float(stats['STAT_SHORT_TRADES'])
-    stats['STAT_LONG_TRADES'] = float(stats['STAT_LONG_TRADES'])
-    stats['STAT_PROFIT_SHORTTRADES'] = float(stats['STAT_PROFIT_SHORTTRADES'])
-    stats['STAT_PROFIT_LONGTRADES'] = float(stats['STAT_PROFIT_LONGTRADES'])
-    stats['STAT_PROFITTRADES_AVGCON'] = float(
+    stats['STAT_TRADES'] = int(stats['STAT_TRADES'])
+    stats['STAT_PROFIT_TRADES'] = int(stats['STAT_PROFIT_TRADES'])
+    stats['STAT_LOSS_TRADES'] = int(stats['STAT_LOSS_TRADES'])
+    stats['STAT_SHORT_TRADES'] = int(stats['STAT_SHORT_TRADES'])
+    stats['STAT_LONG_TRADES'] = int(stats['STAT_LONG_TRADES'])
+    stats['STAT_PROFIT_SHORTTRADES'] = int(stats['STAT_PROFIT_SHORTTRADES'])
+    stats['STAT_PROFIT_LONGTRADES'] = int(stats['STAT_PROFIT_LONGTRADES'])
+    stats['STAT_PROFITTRADES_AVGCON'] = int(
         stats['STAT_PROFITTRADES_AVGCON'])
-    stats['STAT_LOSSTRADES_AVGCON'] = float(stats['STAT_LOSSTRADES_AVGCON'])
+    stats['STAT_LOSSTRADES_AVGCON'] = int(stats['STAT_LOSSTRADES_AVGCON'])
 
     return stats

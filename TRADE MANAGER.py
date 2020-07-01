@@ -11,6 +11,7 @@ from copy_indi_and_ea import copy_files_to_testers
 from run_testers import run_testers
 from stats import decodeHistory
 from stats import decodeStats
+from stats import calculateStats
 
 # https://docs.mql4.com/trading/orderselect
 
@@ -351,5 +352,7 @@ while True:
             counter += 1
 
         if counter >= clients:
-            print('\nFINISHED')
+            # DEINIT
+            print('\nFINISHED\n')
+            calculateStats(stats, history, pairs_to_use, start_date, end_date)
             exit()
