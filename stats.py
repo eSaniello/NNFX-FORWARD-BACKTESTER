@@ -4,7 +4,7 @@ from dateutil.relativedelta import relativedelta
 
 # https://docs.mql4.com/constants/environment_state/statistics#enum_statistics
 
-def calculateStats(stats, trades, pairs, _start_date, _end_date):
+def calculateStats(stats, _trades, pairs, _start_date, _end_date):
     start_date = datetime.strptime(_start_date, '%Y.%m.%d')
     end_date = datetime.strptime(_end_date, '%Y.%m.%d')
     initial_balance = stats[pairs[0]]["STAT_INITIAL_DEPOSIT"]
@@ -15,31 +15,46 @@ def calculateStats(stats, trades, pairs, _start_date, _end_date):
     profit_factor = 0
     annual_roi = 0
     total_return = 0
+    total_rel_dd = 0
+    total_max_dd = 0
+    trades = []
+    for i in range(len(_trades)):
+        if _trades[i] not in _trades[i + 1:]:
+            trades.append(_trades[i])
 
     print('=====STATS=====')
     print(f'Start date: {_start_date}')
     print(f'End date: {_end_date}')
-    print(f'Initial balance: {initial_balance}')
+    print(f'Initial balance: ${initial_balance}')
 
     for symbol in pairs:
         total_net_profit += stats[symbol]['STAT_PROFIT']
         averag_winrate += stats[symbol]['STAT_WINRATE']
         total_gross_profit += stats[symbol]['STAT_GROSS_PROFIT']
         total_gross_loss += stats[symbol]['STAT_GROSS_LOSS']
+        total_max_dd += stats[symbol]['STAT_BALANCEDD_PERCENT']
+        total_rel_dd += stats[symbol]['STAT_BALANCE_DDREL_PERCENT']
 
     averag_winrate = averag_winrate / len(pairs)
     profit_factor = (total_gross_profit / (total_gross_loss * -1))
     date_diff = relativedelta(end_date, start_date)
     annual_roi = (total_net_profit / (date_diff.years) / initial_balance) * 100
     total_return = (total_net_profit / initial_balance) * 100
-    print(f'Total net profit: {round(total_net_profit, 2)}')
+    print(f'Total net profit: ${round(total_net_profit, 2)}')
     print(f'Average winrate: {round(averag_winrate, 2)}%')
-    print(f'Total gross profit: {round(total_gross_profit, 2)}')
-    print(f'Total gross loss: {round(total_gross_loss, 2)}')
+    print(f'Total gross profit: ${round(total_gross_profit, 2)}')
+    print(f'Total gross loss: ${round(total_gross_loss, 2)}')
     print(f'Profit factor: {round(profit_factor, 2)}')
     print(
         f'Annual ROI (%): {round(annual_roi, 2) if date_diff.years > 0 else "-"}%')
-    print(f'Total ROI (%): {round(total_return, 2)}')
+    print(f'Total ROI (%): {round(total_return, 2)}%')
+    print(f'Total trades: {len(trades)}')
+    print(f'Max DD: {round(total_max_dd, 2)}%')
+    print(f'Relative DD: {round(total_rel_dd, 2)}%')
+
+    # for trade in trades:
+    #     if trade['symbol'] == 'AUDNZD':
+    #         print(trade)
 
 
 def decodeHistory(_trade):

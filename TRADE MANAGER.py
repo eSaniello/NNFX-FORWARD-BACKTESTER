@@ -22,8 +22,8 @@ news_avoidance = True
 expert_name = 'NNFX FORWARD BACKTESTER'
 settings_setfile = 'nnfx_forward_backtester'
 timeframe = 'D1'  # M1, M5, M15, M30, H1, H4, D1, W1, MN
-start_date = '2019.01.01'
-end_date = '2020.01.06'
+start_date = '2017.01.01'
+end_date = '2020.04.01'
 spread = '5'  # 0 = use current spread
 
 forex_pairs = ["AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD", "CADCHF", "CADJPY", "CHFJPY", "EURCHF", "EURAUD", "EURCAD", "EURGBP", "EURJPY", "EURNZD", "EURUSD",
@@ -33,7 +33,7 @@ benchmark_fx_pairs = ['EURUSD', 'AUDNZD', 'EURGBP', 'AUDCAD', 'CHFJPY']
 
 dummy_pairs = ['EURUSD']
 
-pairs_to_use = benchmark_fx_pairs
+pairs_to_use = forex_pairs
 
 max_clients = len(pairs_to_use)
 
@@ -340,7 +340,11 @@ while True:
             # break out of loop once we have signals from every client
             if len(signals) == clients:
                 print("Recieved all signals via REP socket")
-                print(signals)
+
+                for symbol in signals:
+                    print(
+                        f"{symbol}: date:{signals[symbol]['date']}, trade1: {signals[symbol]['trade1']}, trade2: {signals[symbol]['trade2']}, open_orders: {signals[symbol]['open_orders']}, signal: {signals[symbol]['signal']}")
+
                 break
 
         except zmq.error.Again:
