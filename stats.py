@@ -9,6 +9,7 @@ def calculateStats(stats, _trades, pairs, _start_date, _end_date):
     end_date = datetime.strptime(_end_date, '%Y.%m.%d')
     initial_balance = stats[pairs[0]]["STAT_INITIAL_DEPOSIT"]
     total_net_profit = 0
+    end_balance = 0
     averag_winrate = 0
     total_gross_profit = 0
     total_gross_loss = 0
@@ -35,12 +36,16 @@ def calculateStats(stats, _trades, pairs, _start_date, _end_date):
         total_max_dd += stats[symbol]['STAT_BALANCEDD_PERCENT']
         total_rel_dd += stats[symbol]['STAT_BALANCE_DDREL_PERCENT']
 
+    end_balance = initial_balance + total_net_profit
     averag_winrate = averag_winrate / len(pairs)
     profit_factor = (total_gross_profit / (total_gross_loss * -1))
     date_diff = relativedelta(end_date, start_date)
     annual_roi = (total_net_profit / (date_diff.years) / initial_balance) * 100
     total_return = (total_net_profit / initial_balance) * 100
+    total_max_dd = total_max_dd / len(pairs)
+    total_rel_dd = total_rel_dd / len(pairs)
     print(f'Total net profit: ${round(total_net_profit, 2)}')
+    print(f'End balance: ${round(end_balance, 2)}')
     print(f'Average winrate: {round(averag_winrate, 2)}%')
     print(f'Total gross profit: ${round(total_gross_profit, 2)}')
     print(f'Total gross loss: ${round(total_gross_loss, 2)}')

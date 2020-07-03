@@ -22,18 +22,21 @@ news_avoidance = True
 expert_name = 'NNFX FORWARD BACKTESTER'
 settings_setfile = 'nnfx_forward_backtester'
 timeframe = 'D1'  # M1, M5, M15, M30, H1, H4, D1, W1, MN
-start_date = '2017.01.01'
+start_date = '2018.01.01'
 end_date = '2020.04.01'
 spread = '5'  # 0 = use current spread
 
 forex_pairs = ["AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD", "CADCHF", "CADJPY", "CHFJPY", "EURCHF", "EURAUD", "EURCAD", "EURGBP", "EURJPY", "EURNZD", "EURUSD",
                "GBPAUD", "GBPCAD", "GBPCHF", "GBPJPY", "GBPNZD", "GBPUSD", "NZDCHF", "NZDCAD", "NZDJPY", "NZDUSD", "USDCAD", "USDCHF", "USDJPY"]
 
+_forex_pairs = ["AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD", "CADCHF", "CADJPY", "CHFJPY", "EURCHF", "EURAUD", "EURCAD", "EURGBP", "EURJPY", "EURNZD", "EURUSD",
+                "GBPAUD", "GBPCAD", "GBPCHF", "GBPJPY", "GBPNZD", "GBPUSD", "NZDJPY", "NZDUSD", "USDCAD", "USDCHF", "USDJPY"]
+
 benchmark_fx_pairs = ['EURUSD', 'AUDNZD', 'EURGBP', 'AUDCAD', 'CHFJPY']
 
-dummy_pairs = ['EURUSD']
+dummy_pairs = ['NZDCHF', 'NZDCAD']
 
-pairs_to_use = forex_pairs
+pairs_to_use = _forex_pairs
 
 max_clients = len(pairs_to_use)
 
@@ -101,7 +104,7 @@ signals = {}
 clients = 0
 history = []
 stats = {}
-# dates = {}
+dates = {}
 while True:
     try:
         signal = socket.recv_string(zmq.NOBLOCK)
@@ -275,8 +278,18 @@ while True:
         else:
             signals[symbol]['instruction'] = 'NEXT'
 
+    # TODO Calculate total balance and equity and store into db
+    bal = 0
+    eq = 0
+    for symbol, signal in signals.items():
+        eq += float(signal['equity'])
+        bal += float(signal['balance'])
+    print(f'Equity (%): {eq}')
+    print(f'Balance (%): {bal}')
+
     print("Sending instructions via PUB socket")
 
+    # send all the instructions to testers
     for symbol in signals:
         pub.send_string(f"{symbol} {signals[symbol]['instruction']}")
 
@@ -343,7 +356,7 @@ while True:
 
                 for symbol in signals:
                     print(
-                        f"{symbol}: date:{signals[symbol]['date']}, trade1: {signals[symbol]['trade1']}, trade2: {signals[symbol]['trade2']}, open_orders: {signals[symbol]['open_orders']}, signal: {signals[symbol]['signal']}")
+                        f"{symbol}: date: {signals[symbol]['date']}, trade1: {signals[symbol]['trade1']}, trade2: {signals[symbol]['trade2']}, open_orders: {signals[symbol]['open_orders']}, signal: {signals[symbol]['signal']}, balance: {signals[symbol]['balance']}, equity: {signals[symbol]['equity']}")
 
                 break
 
