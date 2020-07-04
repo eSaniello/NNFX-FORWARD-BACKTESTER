@@ -22,7 +22,7 @@ news_avoidance = True
 expert_name = 'NNFX FORWARD BACKTESTER'
 settings_setfile = 'nnfx_forward_backtester'
 timeframe = 'D1'  # M1, M5, M15, M30, H1, H4, D1, W1, MN
-start_date = '2018.01.01'
+start_date = '2017.01.01'
 end_date = '2020.04.01'
 spread = '5'  # 0 = use current spread
 
@@ -105,6 +105,8 @@ clients = 0
 history = []
 stats = {}
 dates = {}
+balance = []
+equity = []
 while True:
     try:
         signal = socket.recv_string(zmq.NOBLOCK)
@@ -284,6 +286,9 @@ while True:
     for symbol, signal in signals.items():
         eq += float(signal['equity'])
         bal += float(signal['balance'])
+
+    balance.append(bal)
+    equity.append(eq)
     print(f'Equity (%): {eq}')
     print(f'Balance (%): {bal}')
 
@@ -371,5 +376,6 @@ while True:
         if counter >= clients:
             # DEINIT
             print('\nFINISHED\n')
-            calculateStats(stats, history, pairs_to_use, start_date, end_date)
+            calculateStats(stats, history, pairs_to_use,
+                           start_date, end_date, balance, equity)
             exit()
