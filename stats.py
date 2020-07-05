@@ -38,11 +38,16 @@ def calculateStats(stats, _trades, pairs, _start_date, _end_date, balance, equit
     print(f'End date: {_end_date}')
     print(f'Initial balance: ${initial_balance}')
 
+    print('\n=====STATS PER PAIR=====')
+
     for symbol in pairs:
         total_net_profit += stats[symbol]['STAT_PROFIT']
         averag_winrate += stats[symbol]['STAT_WINRATE']
         total_gross_profit += stats[symbol]['STAT_GROSS_PROFIT']
         total_gross_loss += stats[symbol]['STAT_GROSS_LOSS']
+
+        print(
+            f"{symbol} = profit: {round(stats[symbol]['STAT_PROFIT'], 2)}, winrate: {stats[symbol]['STAT_WINRATE']}, drawdown: {round(stats[symbol]['STAT_BALANCEDD_PERCENT'], 2)}, profit_factor: {round(stats[symbol]['STAT_PROFIT_FACTOR'], 2)}, trades: {stats[symbol]['STAT_TRADES']}")
 
     end_balance = initial_balance + total_net_profit
     averag_winrate = averag_winrate / len(pairs)
@@ -50,6 +55,8 @@ def calculateStats(stats, _trades, pairs, _start_date, _end_date, balance, equit
     date_diff = relativedelta(end_date, start_date)
     annual_roi = (total_net_profit / (date_diff.years) / initial_balance) * 100
     total_return = (total_net_profit / initial_balance) * 100
+
+    print('\n=====FINAL STATS=====')
     print(f'Total net profit: ${round(total_net_profit, 2)}')
     print(f'End balance: ${round(end_balance, 2)}')
     print(f'Average winrate: {round(averag_winrate, 2)}%')
