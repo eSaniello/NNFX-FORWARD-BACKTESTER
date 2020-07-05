@@ -280,7 +280,7 @@ while True:
         else:
             signals[symbol]['instruction'] = 'NEXT'
 
-    # TODO Calculate total balance and equity and store into db
+    # Calculate total balance and equity
     bal = 0
     eq = 0
     for symbol, signal in signals.items():
@@ -289,8 +289,8 @@ while True:
 
     balance.append(bal)
     equity.append(eq)
-    print(f'Equity (%): {eq}')
-    print(f'Balance (%): {bal}')
+    print(f'Equity (%): {round(eq, 2)}%')
+    print(f'Balance (%): {round(bal, 2)}%')
 
     print("Sending instructions via PUB socket")
 
