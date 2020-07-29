@@ -22,21 +22,19 @@ news_avoidance = True
 expert_name = 'NNFX FORWARD BACKTESTER'
 settings_setfile = 'nnfx_forward_backtester'
 timeframe = 'D1'  # M1, M5, M15, M30, H1, H4, D1, W1, MN
-start_date = '2017.01.01'
-end_date = '2020.04.01'
+start_date = '2019.01.01'
+end_date = '2020.06.01'
 spread = '5'  # 0 = use current spread
 
 forex_pairs = ["AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD", "CADCHF", "CADJPY", "CHFJPY", "EURCHF", "EURAUD", "EURCAD", "EURGBP", "EURJPY", "EURNZD", "EURUSD",
                "GBPAUD", "GBPCAD", "GBPCHF", "GBPJPY", "GBPNZD", "GBPUSD", "NZDCHF", "NZDCAD", "NZDJPY", "NZDUSD", "USDCAD", "USDCHF", "USDJPY"]
 
-_forex_pairs = ["AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD", "CADCHF", "CADJPY", "CHFJPY", "EURCHF", "EURAUD", "EURCAD", "EURGBP", "EURJPY", "EURNZD", "EURUSD",
-                "GBPAUD", "GBPCAD", "GBPCHF", "GBPJPY", "GBPNZD", "GBPUSD", "NZDJPY", "NZDUSD", "USDCAD", "USDCHF", "USDJPY"]
-
 benchmark_fx_pairs = ['EURUSD', 'AUDNZD', 'EURGBP', 'AUDCAD', 'CHFJPY']
 
-dummy_pairs = ['NZDCHF', 'NZDCAD']
+dummy_pairs = ["AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD",
+               "CADCHF", "CADJPY", "CHFJPY", "EURCHF", "EURAUD", "USDCHF"]
 
-pairs_to_use = _forex_pairs
+pairs_to_use = forex_pairs
 
 max_clients = len(pairs_to_use)
 

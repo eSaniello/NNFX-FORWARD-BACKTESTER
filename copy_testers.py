@@ -4,5 +4,5 @@ forex_pairs = ["AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD", "CADCHF", "CADJ
                "GBPAUD", "GBPCAD", "GBPCHF", "GBPJPY", "GBPNZD", "GBPUSD", "NZDCHF", "NZDCAD", "NZDJPY", "NZDUSD", "USDCAD", "USDCHF", "USDJPY"]
 
 for pair in forex_pairs:
-    shutil.copytree('portable mt4/', f'testers/{pair}/', True)
+    shutil.copytree('portable mt4/', f'testers/{pair}/')
     print(f'Copied {pair}')
