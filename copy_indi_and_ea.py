@@ -1,5 +1,4 @@
 import shutil
-import os
 
 
 def copy_files_to_testers(pairs):

@@ -47,7 +47,7 @@ def calculateStats(stats, _trades, pairs, _start_date, _end_date, balance, equit
         total_gross_loss += stats[symbol]['STAT_GROSS_LOSS']
 
         print(
-            f"{symbol} = profit: ${round(stats[symbol]['STAT_PROFIT'], 2)}, winrate: {stats[symbol]['STAT_WINRATE']}%, drawdown: {round(stats[symbol]['STAT_BALANCEDD_PERCENT'], 2)}%, profit_factor: {round(stats[symbol]['STAT_PROFIT_FACTOR'], 2)}, trades: {stats[symbol]['STAT_TRADES']}")
+            f"{symbol} = profit: ${round(stats[symbol]['STAT_PROFIT'], 2)}, winrate: {stats[symbol]['STAT_WINRATE']}%, drawdown: {round(stats[symbol]['STAT_BALANCE_DDREL_PERCENT'], 2)}%, profit_factor: {round(stats[symbol]['STAT_PROFIT_FACTOR'], 2)}, trades: {stats[symbol]['STAT_TRADES']}")
 
     end_balance = initial_balance + total_net_profit
     averag_winrate = averag_winrate / len(pairs)

@@ -31,10 +31,10 @@ forex_pairs = ["AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD", "CADCHF", "CADJ
 
 benchmark_fx_pairs = ['EURUSD', 'AUDNZD', 'EURGBP', 'AUDCAD', 'CHFJPY']
 
-dummy_pairs = ["AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD",
-               "CADCHF", "CADJPY", "CHFJPY", "EURCHF", "EURAUD", "USDCHF"]
+dummy_pairs = ['AUDUSD', 'EURUSD', 'GBPUSD', 'USDCAD', 'USDCHF', 'USDJPY']
+# dummy_pairs = ["GBPAUD", 'GBPCAD', 'GBPNZD']
 
-pairs_to_use = forex_pairs
+pairs_to_use = dummy_pairs
 
 max_clients = len(pairs_to_use)
 
@@ -116,6 +116,18 @@ while True:
             print(signal['symbol'] + " Connected")
             signals[signal['symbol']] = signal
 
+        # sort the signals alphabetically to makie sure results are not random
+        signals = {
+            value['symbol']: value for value in sorted(
+                map(
+                    lambda key: signals[key],
+                    signals.keys()
+                ),
+                key=lambda signals: signals['symbol'],
+                reverse=False
+            )
+        }
+
         # Ok we have decoded the signal, tell the client we are done for now
         socket.send_string("OK")
 
@@ -144,7 +156,6 @@ while True:
         #                 f"{symbol} {signals[symbol]['instruction']}")
 # #############################################################################################
 
-        # TODO: remove this for proper testing
         # break out of loop once we have more than 1 client for testing purposes
         if clients >= max_clients:
             break
@@ -307,6 +318,18 @@ while True:
             if signal['symbol'] not in signals:
 
                 signals[signal['symbol']] = signal
+
+            # sort the signals alphabetically to makie sure results are not random
+            signals = {
+                value['symbol']: value for value in sorted(
+                    map(
+                        lambda key: signals[key],
+                        signals.keys()
+                    ),
+                    key=lambda signals: signals['symbol'],
+                    reverse=False
+                )
+            }
 
             # Ok we have decoded the signal, tell the client we are done for now
             socket.send_string("OK")
