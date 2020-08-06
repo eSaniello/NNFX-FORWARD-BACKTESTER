@@ -7,10 +7,6 @@ forex_pairs = ["AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD", "CADCHF", "CADJ
                "GBPAUD", "GBPCAD", "GBPCHF", "GBPJPY", "GBPNZD", "GBPUSD", "NZDCHF", "NZDCAD", "NZDJPY", "NZDUSD", "USDCAD", "USDCHF", "USDJPY"]
 
 
-dummy_pairs = ["GBPAUD", 'GBPCAD', 'GBPNZD']
-# gbpcad, gbpnzd, gbpaud
-
-
 def copy_data(pairs):
     for pair in pairs:
         data = []
@@ -28,4 +24,4 @@ def copy_data(pairs):
         print(f'Copied data to {pair}')
 
 
-copy_data(dummy_pairs)
+copy_data(forex_pairs)

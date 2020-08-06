@@ -23,7 +23,7 @@ expert_name = 'NNFX FORWARD BACKTESTER'
 settings_setfile = 'nnfx_forward_backtester'
 timeframe = 'D1'  # M1, M5, M15, M30, H1, H4, D1, W1, MN
 start_date = '2019.01.01'
-end_date = '2020.06.01'
+end_date = '2020.01.01'
 spread = '5'  # 0 = use current spread
 
 forex_pairs = ["AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD", "CADCHF", "CADJPY", "CHFJPY", "EURCHF", "EURAUD", "EURCAD", "EURGBP", "EURJPY", "EURNZD", "EURUSD",
@@ -31,8 +31,8 @@ forex_pairs = ["AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD", "CADCHF", "CADJ
 
 benchmark_fx_pairs = ['EURUSD', 'AUDNZD', 'EURGBP', 'AUDCAD', 'CHFJPY']
 
-dummy_pairs = ['AUDUSD', 'EURUSD', 'GBPUSD', 'USDCAD', 'USDCHF', 'USDJPY']
-# dummy_pairs = ["GBPAUD", 'GBPCAD', 'GBPNZD']
+dummy_pairs = ["AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD", "CADCHF", "CADJPY", "CHFJPY", "EURCHF", "EURAUD", "EURCAD", "EURGBP", "EURJPY", "EURNZD", "EURUSD",
+               "GBPAUD", "GBPCAD", "GBPCHF", "USDJPY"]
 
 pairs_to_use = dummy_pairs
 
@@ -105,6 +105,7 @@ stats = {}
 dates = {}
 balance = []
 equity = []
+signal_date = None
 while True:
     try:
         signal = socket.recv_string(zmq.NOBLOCK)
@@ -116,7 +117,7 @@ while True:
             print(signal['symbol'] + " Connected")
             signals[signal['symbol']] = signal
 
-        # sort the signals alphabetically to makie sure results are not random
+        # sort the signals alphabetically to make sure results are not random
         signals = {
             value['symbol']: value for value in sorted(
                 map(
@@ -132,28 +133,19 @@ while True:
         socket.send_string("OK")
 
 # #################################################################################
-        # for symbol in signals:
-        #     current_date = datetime.datetime.strptime(
-        #         signals[symbol]['date'], '%Y.%m.%d %H:%M:%S')
+        # Loop through the signals and find the lowest signal date, check for missed candles
+        signal_date = signals[next(iter(signals))]['date']
 
-        #     dates[symbol] = current_date
+        # find the lowest date in the signal first
+        missed = False
+        for symbol, signal in signals.items():
+            # atleast 1 signal has incorrect date
+            if signal_date != signal['date']:
+                missed = True
 
-        # if len(dates) > 0:
-        #     result = checkEqual1(dates)
-        # if result == False:
-        #     now = datetime.datetime.now()
-        #     youngest = max(dt for dt in dates.values() if dt < now)
-
-        #     print('Testers not in sync')
-        #     # go to next candle
-        #     for symbol in signals:
-        #         _date = datetime.datetime.strptime(
-        #             signals[symbol]['date'], '%Y.%m.%d %H:%M:%S')
-
-        #         if _date != youngest:
-        #             signals[symbol]['instruction'] = 'NEXT'
-        #             pub.send_string(
-        #                 f"{symbol} {signals[symbol]['instruction']}")
+            # find the lowest date
+            if signal['date'] < signal_date:
+                signal_date = signal['date']
 # #############################################################################################
 
         # break out of loop once we have more than 1 client for testing purposes
@@ -214,7 +206,7 @@ while True:
     # define LONG 1
     # define SHORT 2
 
-    # this will just be a race to whos first, need to sort signals buy an order at some stage
+    # this will just be a race to who's first
 
     # NEWS
     # If there is then don't trade
@@ -298,16 +290,19 @@ while True:
 
     balance.append(bal)
     equity.append(eq)
-    print(f'Equity (%): {round(eq, 2)}%')
-    print(f'Balance (%): {round(bal, 2)}%')
+    print(f'Equity: {round(eq, 2)}%')
+    print(f'Balance: {round(bal, 2)}%')
 
     print("Sending instructions via PUB socket")
 
     # send all the instructions to testers
     for symbol in signals:
+        if signals[symbol]['date'] != signal_date:
+            signals[symbol]['instruction'] = 'HOLD'
+
         pub.send_string(f"{symbol} {signals[symbol]['instruction']}")
 
-    # OK Instructions set, waiting for next candle information
+    # OK Instructions sent, waiting for next candle information
     signals = {}
 
     while True:
@@ -334,31 +329,6 @@ while True:
             # Ok we have decoded the signal, tell the client we are done for now
             socket.send_string("OK")
 
-    # #################################################################################
-            # for symbol in signals:
-            #     current_date = datetime.datetime.strptime(
-            #         signals[symbol]['date'], '%Y.%m.%d %H:%M:%S')
-
-            #     dates[symbol] = current_date
-
-            # if len(dates) > 0:
-            #     result = checkEqual1(dates)
-            # if result == False:
-            #     now = datetime.datetime.now()
-            #     youngest = max(dt for dt in dates.values() if dt < now)
-
-            #     print('Testers not in sync')
-            #     # go to next candle
-            #     for symbol in signals:
-            #         _date = datetime.datetime.strptime(
-            #             signals[symbol]['date'], '%Y.%m.%d %H:%M:%S')
-
-            #         if _date != youngest:
-            #             signals[symbol]['instruction'] = 'NEXT'
-            #             pub.send_string(
-            #                 f"{symbol} {signals[symbol]['instruction']}")
-    # #############################################################################################
-
             # Put all trades in an array
             if(signals[signal['symbol']]['order1'] != 0):
                 if(signals[signal['symbol']]['order1'] not in history):
@@ -375,6 +345,22 @@ while True:
                 if(signal['symbol'] not in stats):
                     stat = decodeStats(signals[signal['symbol']]['stats'])
                     stats[signal['symbol']] = stat
+
+    # #################################################################################
+            # Loop through the signals and find the lowest signal date, check for missed candles
+            signal_date = signals[next(iter(signals))]['date']
+
+            # find the lowest date in the signal first
+            missed = False
+            for symbol, signal in signals.items():
+                # atleast 1 signal has incorrect date
+                if signal_date != signal['date']:
+                    missed = True
+
+                # find the lowest date
+                if signal['date'] < signal_date:
+                    signal_date = signal['date']
+    # #############################################################################################
 
             # break out of loop once we have signals from every client
             if len(signals) == clients:
