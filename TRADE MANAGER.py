@@ -22,8 +22,8 @@ news_avoidance = True
 expert_name = 'NNFX FORWARD BACKTESTER'
 settings_setfile = 'nnfx_forward_backtester'
 timeframe = 'D1'  # M1, M5, M15, M30, H1, H4, D1, W1, MN
-start_date = '2019.01.01'
-end_date = '2020.01.01'
+start_date = '2010.01.01'
+end_date = '2021.01.01'
 spread = '5'  # 0 = use current spread
 
 forex_pairs = ["AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD", "CADCHF", "CADJPY", "CHFJPY", "EURCHF", "EURAUD", "EURCAD", "EURGBP", "EURJPY", "EURNZD", "EURUSD",

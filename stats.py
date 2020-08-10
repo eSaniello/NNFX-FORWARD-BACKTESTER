@@ -34,6 +34,7 @@ def calculateStats(stats, _trades, pairs, _start_date, _end_date, balance, equit
                 max_dd = current_dd
 
     print('=====STATS=====')
+    print(f'Total pairs tested: {len(pairs)}')
     print(f'Start date: {_start_date}')
     print(f'End date: {_end_date}')
     print(f'Initial balance: ${initial_balance}')
