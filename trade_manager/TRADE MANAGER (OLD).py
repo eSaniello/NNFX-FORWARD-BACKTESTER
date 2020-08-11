@@ -3,11 +3,9 @@ import time
 import sys
 import msvcrt
 import json
-import datetime
-import csv
 from news import check_for_news
 from evz import check_evz
-from copy_indi_and_ea import copy_files_to_testers
+from copy_indi_and_ea import _copy_files_to_testers
 from run_testers import run_testers
 from stats import decodeHistory
 from stats import decodeStats
@@ -22,8 +20,8 @@ news_avoidance = True
 expert_name = 'NNFX FORWARD BACKTESTER'
 settings_setfile = 'nnfx_forward_backtester'
 timeframe = 'D1'  # M1, M5, M15, M30, H1, H4, D1, W1, MN
-start_date = '2010.01.01'
-end_date = '2021.01.01'
+start_date = '2019.01.01'
+end_date = '2020.08.11'
 spread = '5'  # 0 = use current spread
 
 forex_pairs = ["AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD", "CADCHF", "CADJPY", "CHFJPY", "EURCHF", "EURAUD", "EURCAD", "EURGBP", "EURJPY", "EURNZD", "EURUSD",
@@ -34,13 +32,13 @@ benchmark_fx_pairs = ['EURUSD', 'AUDNZD', 'EURGBP', 'AUDCAD', 'CHFJPY']
 dummy_pairs = ["AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD", "CADCHF", "CADJPY", "CHFJPY", "EURCHF", "EURAUD", "EURCAD", "EURGBP", "EURJPY", "EURNZD", "EURUSD",
                "GBPAUD", "GBPCAD", "GBPCHF", "USDJPY"]
 
-pairs_to_use = forex_pairs
+pairs_to_use = benchmark_fx_pairs
 
 max_clients = len(pairs_to_use)
 
 # copy all the files to the testers first
 print('Copying all the necesarry files to all the testers...')
-copy_files_to_testers(forex_pairs)
+_copy_files_to_testers(forex_pairs)
 
 # run all the testers
 print('\nStarting all clients...')
@@ -57,8 +55,6 @@ pub.bind("tcp://127.0.0.1:6666")
 
 def kbfunc():
     x = msvcrt.kbhit()
-    # print(msvcrt.getch())
-    # print(ord(msvcrt.getch()))
 
     if x:
         ret = ord(msvcrt.getch())
@@ -102,7 +98,6 @@ signals = {}
 clients = 0
 history = []
 stats = {}
-dates = {}
 balance = []
 equity = []
 signal_date = None
@@ -243,7 +238,7 @@ while True:
                 24, signals[symbol]['date'], symbol, base, quote, False)
 
             if news == True:
-                if signals[symbol]['trade1'] == -1 and signals[symbol]['trade1'] != -1:
+                if signals[symbol]['trade1'] == -1 and signals[symbol]['trade2'] != -1:
                     close_trades = False
                 else:
                     close_trades = True

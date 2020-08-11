@@ -1,7 +1,7 @@
 import shutil
 
 
-def copy_files_to_testers(pairs):
+def _copy_files_to_testers(pairs):
     for pair in pairs:
         # remove the folders first
         shutil.rmtree(

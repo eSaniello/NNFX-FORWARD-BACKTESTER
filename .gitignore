@@ -3,3 +3,5 @@
 /__pycache__
 /.vscode
 /reports
+/__pycache__
+/trade_manager/__pycache__
