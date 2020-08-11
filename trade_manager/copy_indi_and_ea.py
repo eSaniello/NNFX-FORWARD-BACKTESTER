@@ -6,10 +6,15 @@ def _copy_files_to_testers(pairs):
         # remove the folders first
         shutil.rmtree(
             f'testers/{pair}/MQL4/Experts/')
+        shutil.rmtree(
+            f'EA/')
 
         # copy the folders
         shutil.copytree(
             'portable mt4/MQL4/Experts/', f'testers/{pair}/MQL4/Experts/')
+
+        shutil.copytree(
+            'portable mt4/MQL4/Experts/', f'EA/')
 
         # copy the nnfx_forward_backtester.ini file
         shutil.copy('portable mt4/nnfx_forward_backtester.ini',
