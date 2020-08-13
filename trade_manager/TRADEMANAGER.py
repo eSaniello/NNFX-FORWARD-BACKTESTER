@@ -14,7 +14,7 @@ from stats import calculateStats
 
 class TradeManager:
     # Initialize all parameters first
-    def __init__(self, evz_treshold, news_avoidance, news_hours, filter_high_impact_news_only, expert_name, settings_setfile, timeframe, start_date, end_date, spread, pairs_to_use):
+    def __init__(self, evz_treshold, news_avoidance, news_hours, filter_high_impact_news_only, expert_name, settings_setfile, timeframe, start_date, end_date, spread, pairs_to_use, optimisation):
         print("STARTING BACKWARD FORWARD SERVER\n")
 
         self.evz_treshold = evz_treshold
@@ -28,6 +28,7 @@ class TradeManager:
         self.pairs_to_use = pairs_to_use
         self.news_hours = news_hours
         self.filter_high_impact_news_only = filter_high_impact_news_only
+        self.optimisation = optimisation
 
     # Copy all the files to the testers
     def copy_files_to_testers(self):
@@ -363,16 +364,26 @@ class TradeManager:
                 except zmq.error.Again:
                     time.sleep(.001)
 
-            counter = 0
-            for symbol in signals:
-                if signals[symbol]['finished'] == True:
-                    counter += 1
-
-                if counter >= clients:
+            if self.optimisation == True:
+                if signals[list(signals.keys())[0]]['finished'] == True:
                     # DEINIT
                     print('\nFINISHED\n')
 
                     # once done testing, calculate all the statistics
                     calculateStats(stats, history, self.pairs_to_use,
                                    self.start_date, self.end_date, balance, equity)
-                    exit()
+                    break
+            else:
+                counter = 0
+                for symbol in signals:
+                    if signals[symbol]['finished'] == True:
+                        counter += 1
+
+                    if counter >= clients:
+                        # DEINIT
+                        print('\nFINISHED\n')
+
+                        # once done testing, calculate all the statistics
+                        calculateStats(stats, history, self.pairs_to_use,
+                                       self.start_date, self.end_date, balance, equity)
+                        exit()
