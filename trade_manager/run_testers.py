@@ -31,7 +31,7 @@ def replace_in_file(file_path, str_search, str_replace):
 def run_testers(pairs, _expert_name, _settings_setfile, _timeframe, _spread, _start_date, _end_date):
     for pair in pairs:
         # change .ini file for every tester
-        path_to_ini_file = f'testers/{pair}/nnfx_forward_backtester.ini'
+        path_to_ini_file = f'testers/{pair}/tester/nnfx_forward_backtester.ini'
         replace_in_file(path_to_ini_file, expert_token, _expert_name)
         replace_in_file(path_to_ini_file, file_token, _settings_setfile)
         replace_in_file(path_to_ini_file, symbol_token, pair)
@@ -42,7 +42,7 @@ def run_testers(pairs, _expert_name, _settings_setfile, _timeframe, _spread, _st
 
         # open tester with .ini file to run strategy tester automatically with above specified settings
         path_to_tester = f"C:\\Users\\Shaniel Samadhan\\Desktop\\NNFX FORWARD BACKTESTER\\testers\\{pair}\\terminal.exe"
-        absolute_path_to_ini_file = f"C:\\Users\\Shaniel Samadhan\\Desktop\\NNFX FORWARD BACKTESTER\\testers\\{pair}\\nnfx_forward_backtester.ini"
+        absolute_path_to_ini_file = f"C:\\Users\\Shaniel Samadhan\\Desktop\\NNFX FORWARD BACKTESTER\\testers\\{pair}\\tester\\nnfx_forward_backtester.ini"
         command = f'"{path_to_tester}" "{absolute_path_to_ini_file}" /skipupdate /portable'
         # print(command)
         subprocess.Popen(shlex.split(command))

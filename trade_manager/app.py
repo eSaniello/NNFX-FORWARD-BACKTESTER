@@ -2,6 +2,7 @@ from TRADEMANAGER import TradeManager
 from optimizations import replace_in_file, navigate_and_rename
 import os
 import shutil
+from time import sleep
 
 
 # SETTINGS
@@ -10,7 +11,7 @@ news_avoidance = True
 expert_name = 'NNFX FORWARD BACKTESTER'
 settings_setfile = 'nnfx_forward_backtester'
 timeframe = 'D1'  # M1, M5, M15, M30, H1, H4, D1, W1, MN
-start_date = '2019.01.01'
+start_date = '2018.01.01'
 end_date = '2020.08.10'
 spread = '5'  # 0 = use current spread
 optimisation = True
@@ -25,7 +26,7 @@ dummy_pairs = ["AUDCAD"]
 
 # For optimization
 token = "<PERIOD>"
-period_start = 0
+period_start = 5
 period_step = 5
 period_end = 30
 
@@ -51,3 +52,4 @@ while i <= period_end:
     manager.start_trade_manager()
 
     i += period_step
+    sleep(2)

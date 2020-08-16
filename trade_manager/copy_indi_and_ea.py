@@ -18,10 +18,10 @@ def _copy_files_to_testers(pairs):
 
         # copy the nnfx_forward_backtester.ini file
         shutil.copy('portable mt4/nnfx_forward_backtester.ini',
-                    f'testers/{pair}/')
+                    f'testers/{pair}/tester/')
 
         # copy the nnfx_forward_backtester.set file
         shutil.copy('portable mt4/nnfx_forward_backtester.set',
-                    f'testers/{pair}/')
+                    f'testers/{pair}/tester/')
 
         print(f'Copied indicators, experts, settings and .ini file to {pair}')
