@@ -370,8 +370,10 @@ class TradeManager:
                     print('\nFINISHED\n')
 
                     # once done testing, calculate all the statistics
-                    calculateStats(stats, history, self.pairs_to_use,
-                                   self.start_date, self.end_date, balance, equity)
+                    calculateStats(
+                        stats, history, self.pairs_to_use,
+                        self.start_date, self.end_date, balance, equity
+                    )
                     break
             else:
                 counter = 0
@@ -384,6 +386,8 @@ class TradeManager:
                         print('\nFINISHED\n')
 
                         # once done testing, calculate all the statistics
-                        calculateStats(stats, history, self.pairs_to_use,
-                                       self.start_date, self.end_date, balance, equity)
+                        calculateStats(
+                            stats, history, self.pairs_to_use,
+                            self.start_date, self.end_date, balance, equity
+                        )
                         exit()
