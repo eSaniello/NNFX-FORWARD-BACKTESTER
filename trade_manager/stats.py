@@ -5,6 +5,7 @@ from dateutil.relativedelta import relativedelta
 # https://docs.mql4.com/constants/environment_state/statistics#enum_statistics
 
 def calculateStats(stats, _trades, pairs, _start_date, _end_date, balance, equity):
+    total_stats = {}
     start_date = datetime.strptime(_start_date, '%Y.%m.%d')
     end_date = datetime.strptime(_end_date, '%Y.%m.%d')
     initial_balance = stats[pairs[0]]["STAT_INITIAL_DEPOSIT"]
@@ -33,6 +34,12 @@ def calculateStats(stats, _trades, pairs, _start_date, _end_date, balance, equit
             if current_dd > max_dd:
                 max_dd = current_dd
 
+    total_stats['pairs_tested'] = len(pairs)
+    total_stats['start_date'] = _start_date
+    total_stats['end_date'] = _end_date
+    total_stats['init_balance'] = initial_balance
+    total_stats['stats_per_symbol'] = []
+
     print('=====STATS=====')
     print(f'Total pairs tested: {len(pairs)}')
     print(f'Start date: {_start_date}')
@@ -47,6 +54,15 @@ def calculateStats(stats, _trades, pairs, _start_date, _end_date, balance, equit
         total_gross_profit += stats[symbol]['STAT_GROSS_PROFIT']
         total_gross_loss += stats[symbol]['STAT_GROSS_LOSS']
 
+        total_stats['stats_per_symbol'].append({
+            'symbol': symbol,
+            'profit': round(stats[symbol]['STAT_PROFIT'], 2),
+            'winrate': stats[symbol]['STAT_WINRATE'],
+            'drawdown': round(stats[symbol]['STAT_BALANCE_DDREL_PERCENT']),
+            'profit_factor': round(stats[symbol]['STAT_PROFIT_FACTOR'], 2),
+            'trades': stats[symbol]['STAT_TRADES']
+        })
+
         print(
             f"{symbol} = profit: ${round(stats[symbol]['STAT_PROFIT'], 2)}, winrate: {stats[symbol]['STAT_WINRATE']}%, drawdown: {round(stats[symbol]['STAT_BALANCE_DDREL_PERCENT'], 2)}%, profit_factor: {round(stats[symbol]['STAT_PROFIT_FACTOR'], 2)}, trades: {stats[symbol]['STAT_TRADES']}")
 
@@ -56,6 +72,18 @@ def calculateStats(stats, _trades, pairs, _start_date, _end_date, balance, equit
     date_diff = relativedelta(end_date, start_date)
     annual_roi = (total_net_profit / (date_diff.years) / initial_balance) * 100
     total_return = (total_net_profit / initial_balance) * 100
+
+    total_stats['net_profit'] = round(total_net_profit, 2)
+    total_stats['end_balance'] = round(end_balance, 2)
+    total_stats['average_winrate'] = round(averag_winrate, 2)
+    total_stats['total_gross_profit'] = round(total_gross_profit, 2)
+    total_stats['total_gross_loss'] = round(total_gross_loss, 2)
+    total_stats['profit_factor'] = round(profit_factor, 2)
+    total_stats['annual_roi'] = round(
+        annual_roi, 2) if date_diff.years > 0 else "-"
+    total_stats['total_roi'] = round(total_return, 2)
+    total_stats['total_trades'] = len(trades)
+    total_stats['max_drawdown'] = round(max_dd, 2)
 
     print('\n=====FINAL STATS=====')
     print(f'Total net profit: ${round(total_net_profit, 2)}')
@@ -69,6 +97,8 @@ def calculateStats(stats, _trades, pairs, _start_date, _end_date, balance, equit
     print(f'Total ROI (%): {round(total_return, 2)}%')
     print(f'Total trades: {len(trades)}')
     print(f'Max drawdown: {round(max_dd, 2)}%')
+
+    return total_stats
 
 
 def decodeHistory(_trade):

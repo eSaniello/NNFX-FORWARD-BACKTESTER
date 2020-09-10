@@ -364,17 +364,22 @@ class TradeManager:
                 except zmq.error.Again:
                     time.sleep(.001)
 
+            # if optimisation is true then just break out the loop
             if self.optimisation == True:
                 if signals[list(signals.keys())[0]]['finished'] == True:
                     # DEINIT
                     print('\nFINISHED\n')
 
                     # once done testing, calculate all the statistics
-                    calculateStats(
+                    total_stats = calculateStats(
                         stats, history, self.pairs_to_use,
                         self.start_date, self.end_date, balance, equity
                     )
+
+                    return total_stats
+
                     break
+            # if optimisation is false then just end the program
             else:
                 counter = 0
                 for symbol in signals:
@@ -386,8 +391,11 @@ class TradeManager:
                         print('\nFINISHED\n')
 
                         # once done testing, calculate all the statistics
-                        calculateStats(
+                        total_stats = calculateStats(
                             stats, history, self.pairs_to_use,
                             self.start_date, self.end_date, balance, equity
                         )
+
+                        return total_stats
+
                         exit()
