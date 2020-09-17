@@ -60,8 +60,10 @@ def generateOptimisationList(cur_variables, optimisations, output={}, cur_level=
                         output[cur_item[0]] = cur_range
 
                         if cur_level < len(cur_variables):
-                            generateOptimisationList(cur_variables, optimisations,
-                                                     dict(output), cur_level + 1)
+                            generateOptimisationList(
+                                cur_variables, optimisations,
+                                dict(output), cur_level + 1
+                            )
                         else:
                             optimisations.append(output)
             else:
