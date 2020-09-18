@@ -1,3 +1,4 @@
+import re
 from numpy import arange
 
 
@@ -77,3 +78,16 @@ def generateOptimisationList(cur_variables, optimisations, output={}, cur_level=
                             cur_variables, optimisations, output, cur_level + 1)
                     else:
                         optimisations.append(output)
+
+
+def apply_setting_to_ini_file(name, value):
+    path_to_ini_file = f'portable mt4/NNFX FORWARD BACKTESTER.ini'
+
+    lines = []
+    for line in open(path_to_ini_file, 'rt').readlines():
+        line = re.sub(f'{name}=.+', f'{name}={value}', line)
+        lines.append(line)
+
+    f = open(path_to_ini_file, 'wt')
+    f.writelines(lines)
+    f.close()

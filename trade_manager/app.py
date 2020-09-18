@@ -1,5 +1,6 @@
 from TRADEMANAGER import TradeManager
 from optimize import generateOptimisationList
+from optimize import apply_setting_to_ini_file
 from time import sleep
 
 
@@ -24,12 +25,20 @@ benchmark_fx_pairs = ['EURUSD', 'AUDNZD', 'EURGBP', 'AUDCAD', 'CHFJPY']
 
 dummy_pairs = ["AUDCAD"]
 
+# optimisation flow
+# gen optim list >> loop over list >> apply settings to .ini files and copy >> run testers with settings >> repeat
 # Settings to optimise
+# FORMAT
+# range: 'name>start~stop:step'
+# boolean: 'name_of_var'
+# linear: 'name>1,2,3,4,5'
+# range and linear mix: 'name>2~7,8,9,10~12'
 optimisation_variables = [
     # 'evz_treshold>2~8:2',
     # 'evz_treshold>1~10',
     # 'lookBackDays>180,365,730',
-    'news_avoidance'
+    'news_avoidance',
+    'MaPeriod>5~20:5'
 ]
 
 if optimisation:
@@ -41,6 +50,9 @@ if optimisation:
     all_stats = []
 
     for setting in optimisationList:
+        # Apply settings to EAname.ini settings file
+        apply_setting_to_ini_file('MaPeriod', setting['MaPeriod'])
+
         manager = TradeManager(
             pairs_to_use=benchmark_fx_pairs,
             # evz_treshold=setting['evz_treshold'],
