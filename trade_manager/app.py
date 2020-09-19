@@ -3,6 +3,19 @@ from optimize import generateOptimisationList
 from optimize import apply_setting_to_ini_file
 from tqdm import tqdm
 import sys
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+
+scope = [
+    "https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/spreadsheets',
+    "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive"
+]
+
+creds = ServiceAccountCredentials.from_json_keyfile_name("creds.json", scope)
+
+client = gspread.authorize(creds)
+
+sheet = client.open("trading bot").sheet1  # Open the spreadhseet
 
 
 # SETTINGS
@@ -71,6 +84,24 @@ if optimisation:
         manager.copy_files_to_testers()
         manager.start_testers()
         stats = manager.start_trade_manager()
+
+        # add each iteration result to a google sheet so I can see the progress
+        insertRow = []
+        insertRow.append(str(setting))
+        insertRow.append(stats['init_balance'])
+        insertRow.append(stats['net_profit'])
+        insertRow.append(stats['end_balance'])
+        insertRow.append(stats['average_winrate'])
+        insertRow.append(stats['total_gross_profit'])
+        insertRow.append(stats['total_gross_loss'])
+        insertRow.append(stats['profit_factor'])
+        insertRow.append(stats['annual_roi'])
+        insertRow.append(stats['total_roi'])
+        insertRow.append(stats['total_trades'])
+        insertRow.append(stats['max_drawdown'])
+
+        sheet.append_row(insertRow)
+
 else:
     manager = TradeManager(
         pairs_to_use=benchmark_fx_pairs,
