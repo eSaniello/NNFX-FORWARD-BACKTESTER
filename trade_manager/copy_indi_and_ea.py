@@ -1,7 +1,7 @@
 import shutil
 
 
-def _copy_files_to_testers(pairs):
+def _copy_files_to_testers(pairs, optimisation):
     for pair in pairs:
         # remove the folders first
         shutil.rmtree(
@@ -24,4 +24,6 @@ def _copy_files_to_testers(pairs):
         shutil.copy('portable mt4/NNFX FORWARD BACKTESTER.ini',
                     f'testers/{pair}/tester/')
 
-        print(f'Copied indicators, experts, settings and .ini file to {pair}')
+        if optimisation == False:
+            print(
+                f'Copied indicators, experts, settings and .ini file to {pair}')

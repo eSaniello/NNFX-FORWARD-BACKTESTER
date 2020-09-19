@@ -20,7 +20,7 @@ def create_connection(db_file):
     return conn
 
 
-def check_for_news(hours, date, symbol, base, quote, high_impact_only=False):
+def check_for_news(hours, date, symbol, base, quote, optimisation, high_impact_only=False):
     """ Check if there is news in the next given hours
     :param hours: how many hours to avoid
     :param date: current date
@@ -28,6 +28,7 @@ def check_for_news(hours, date, symbol, base, quote, high_impact_only=False):
     :param quote: quote currency
     :param symbol: currency pair
     :param high_impact_only: filter only news with high impact
+    :param optimisation: don't print if this is false
     :return: to trade or not to trade boolean
     """
 
@@ -58,7 +59,8 @@ def check_for_news(hours, date, symbol, base, quote, high_impact_only=False):
             # 4) Consumer Price Index (CPI)
 
             if (high_impact_only == True and impact.find('H') > -1) or (title.find('Non-Farm Employment') > -1 and title.find('ADP') == -1) or title.find('Federal Funds Rate') > -1 or title.find('Fed Chair') > -1 or title.find('CPI') > -1:
-                print(f'{symbol} News time out: {title} - {news_date}')
+                if optimisation == False:
+                    print(f'{symbol} News time out: {title} - {news_date}')
                 return True
         # AUD news to avoid
         elif (base == 'AUD' or quote == 'AUD') and country.find('AUD') > -1:
@@ -67,7 +69,8 @@ def check_for_news(hours, date, symbol, base, quote, high_impact_only=False):
             # 2) Unemployment Rates
 
             if (high_impact_only == True and impact.find('H') > -1) or title.find('RBA Rate') > -1 or title.find('Unemployment') > -1:
-                print(f'{symbol} News time out: {title} - {news_date}')
+                if optimisation == False:
+                    print(f'{symbol} News time out: {title} - {news_date}')
                 return True
         # CAD news to avoid
         elif (base == 'CAD' or quote == 'CAD') and country.find('CAD') > -1:
@@ -78,7 +81,8 @@ def check_for_news(hours, date, symbol, base, quote, high_impact_only=False):
             # 4) Consumer Price Index (CPI)
 
             if (high_impact_only == True and impact.find('H') > -1) or title.find('Unemployment') > -1 or title.find('BOC Rate') > -1 or title.find('Retail Sales') > -1 or title.find('CPI') > -1:
-                print(f'{symbol} News time out: {title} - {news_date}')
+                if optimisation == False:
+                    print(f'{symbol} News time out: {title} - {news_date}')
                 return True
         # CHF news to avoid
         elif (base == 'CHF' or quote == 'CHF') and country.find('CHF') > -1:
@@ -86,7 +90,8 @@ def check_for_news(hours, date, symbol, base, quote, high_impact_only=False):
             # 1) Interest (Libor) Rates
 
             if (high_impact_only == True and impact.find('H') > -1) or title.find('Libor') > -1:
-                print(f'{symbol} News time out: {title} - {news_date}')
+                if optimisation == False:
+                    print(f'{symbol} News time out: {title} - {news_date}')
                 return True
         # EUR news to avoid
         elif (base == 'EUR' or quote == 'EUR') and country.find('EUR') > -1:
@@ -95,7 +100,8 @@ def check_for_news(hours, date, symbol, base, quote, high_impact_only=False):
             # 2) ECB President (Currently Draghi) speaks
 
             if (high_impact_only == True and impact.find('H') > -1) or title.find('Main Refinancing Rate') > -1 or title.find('Monetary Policy') > -1 or title.find('ECB President') > -1:
-                print(f'{symbol} News time out: {title} - {news_date}')
+                if optimisation == False:
+                    print(f'{symbol} News time out: {title} - {news_date}')
                 return True
         # GBP news to avoid
         elif (base == 'GBP' or quote == 'GBP') and country.find('GBP') > -1:
@@ -104,7 +110,8 @@ def check_for_news(hours, date, symbol, base, quote, high_impact_only=False):
             # 2) Gross Domestic Product (GDP)
 
             if (high_impact_only == True and impact.find('H') > -1) or title.find('Bank Rate Votes') > -1 or title.find('GDP') > -1:
-                print(f'{symbol} News time out: {title} - {news_date}')
+                if optimisation == False:
+                    print(f'{symbol} News time out: {title} - {news_date}')
                 return True
         # JPY news to avoid
         elif (base == 'JPY' or quote == 'JPY') and country.find('JPY') > -1:
@@ -112,7 +119,8 @@ def check_for_news(hours, date, symbol, base, quote, high_impact_only=False):
             # 1) Interest Rates
 
             if (high_impact_only == True and impact.find('H') > -1) or title.find('BOJ Policy Rate') > -1:
-                print(f'{symbol} News time out: {title} - {news_date}')
+                if optimisation == False:
+                    print(f'{symbol} News time out: {title} - {news_date}')
                 return True
         # NZD news to avoid
         elif (base == 'NZD' or quote == 'NZD') and country.find('NZD') > -1:
@@ -123,7 +131,8 @@ def check_for_news(hours, date, symbol, base, quote, high_impact_only=False):
             # 4) Global Dairy Trade (GDT)
 
             if (high_impact_only == True and impact.find('H') > -1) or title.find('RBNZ Rate') > -1 or title.find('Unemployment') > -1 or title.find('GDP') > -1 or title.find('GDT') > -1:
-                print(f'{symbol} News time out: {title} - {news_date}')
+                if optimisation == False:
+                    print(f'{symbol} News time out: {title} - {news_date}')
                 return True
 
     return False

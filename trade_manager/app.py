@@ -1,11 +1,12 @@
 from TRADEMANAGER import TradeManager
 from optimize import generateOptimisationList
 from optimize import apply_setting_to_ini_file
-from time import sleep
+from tqdm import tqdm
+import sys
 
 
 # SETTINGS
-optimisation = False
+optimisation = True
 evz_treshold = 3
 news_avoidance = True
 expert_name = 'NNFX FORWARD BACKTESTER'
@@ -37,8 +38,8 @@ optimisation_variables = [
     # 'evz_treshold>2~8:2',
     # 'evz_treshold>1~10',
     # 'lookBackDays>180,365,730',
-    'news_avoidance',
-    'MaPeriod>5~20:5'
+    # 'news_avoidance',
+    'MaPeriod>5~15:5'
 ]
 
 if optimisation:
@@ -46,10 +47,7 @@ if optimisation:
     optimisationList = []
     generateOptimisationList(optimisation_variables, optimisationList)
 
-    # list to store all stats in
-    all_stats = []
-
-    for setting in optimisationList:
+    for setting in tqdm(optimisationList, file=sys.stdout, desc='Running test'):
         # Apply settings to EAname.ini settings file
         apply_setting_to_ini_file('MaPeriod', setting['MaPeriod'])
 
@@ -57,7 +55,8 @@ if optimisation:
             pairs_to_use=benchmark_fx_pairs,
             # evz_treshold=setting['evz_treshold'],
             evz_treshold=evz_treshold,
-            news_avoidance=setting['news_avoidance'],
+            # news_avoidance=setting['news_avoidance'],
+            news_avoidance=news_avoidance,
             news_hours=24,
             filter_high_impact_news_only=False,
             expert_name=expert_name,
@@ -72,21 +71,6 @@ if optimisation:
         manager.copy_files_to_testers()
         manager.start_testers()
         stats = manager.start_trade_manager()
-        all_stats.append({'settings': setting, 'stats': stats})
-
-    # sort all stats after optimisation completes
-    # find highest roi
-    highest_roi = 0.0
-    highest_stats = None
-    for stat in all_stats:
-        roi = float(stat['stats']['total_roi'])
-        if roi > highest_roi:
-            highest_roi = roi
-            highest_stats = stat
-
-    # print best performing run
-    print(highest_roi)
-    print(highest_stats)
 else:
     manager = TradeManager(
         pairs_to_use=benchmark_fx_pairs,

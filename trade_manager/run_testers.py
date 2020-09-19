@@ -28,7 +28,7 @@ def replace_in_file(file_path, str_search, str_replace):
     fin.close()
 
 
-def run_testers(pairs, _expert_name, _settings_setfile, _timeframe, _spread, _start_date, _end_date):
+def run_testers(pairs, _expert_name, _settings_setfile, _timeframe, _spread, _start_date, _end_date, optimisation):
     for pair in pairs:
         # change .ini file for every tester
         path_to_ini_file = f'testers/{pair}/config/nnfx_forward_backtester.ini'
@@ -46,7 +46,9 @@ def run_testers(pairs, _expert_name, _settings_setfile, _timeframe, _spread, _st
         command = f'"{path_to_tester}" "{absolute_path_to_ini_file}" /skipupdate /portable'
         # print(command)
         subprocess.Popen(shlex.split(command))
-        print(f'Started {pair}')
+
+        if optimisation == False:
+            print(f'Started {pair}')
 
 
 # https://www.mql5.com/en/forum/127577

@@ -15,7 +15,6 @@ from stats import calculateStats
 class TradeManager:
     # Initialize all parameters first
     def __init__(self, evz_treshold, news_avoidance, news_hours, filter_high_impact_news_only, expert_name, settings_setfile, timeframe, start_date, end_date, spread, pairs_to_use, optimisation):
-        print("STARTING BACKWARD FORWARD SERVER\n")
 
         self.evz_treshold = evz_treshold
         self.news_avoidance = news_avoidance
@@ -30,16 +29,21 @@ class TradeManager:
         self.filter_high_impact_news_only = filter_high_impact_news_only
         self.optimisation = optimisation
 
+        if self.optimisation == False:
+            print("STARTING BACKWARD FORWARD SERVER\n")
+
     # Copy all the files to the testers
     def copy_files_to_testers(self):
-        print('Copying all the necesarry files to all the testers...')
-        _copy_files_to_testers(self.pairs_to_use)
+        if self.optimisation == False:
+            print('Copying all the necesarry files to all the testers...')
+        _copy_files_to_testers(self.pairs_to_use, self.optimisation)
 
     # Start all testers
     def start_testers(self):
-        print('\nStarting all clients...')
+        if self.optimisation == False:
+            print('\nStarting all clients...')
         run_testers(self.pairs_to_use, self.expert_name, self.settings_setfile,
-                    self.timeframe, self.spread, self.start_date, self.end_date)
+                    self.timeframe, self.spread, self.start_date, self.end_date, self.optimisation)
 
     # start the server and begin trading
     def start_trade_manager(self):
@@ -52,7 +56,8 @@ class TradeManager:
         pub.bind("tcp://127.0.0.1:6666")
 
         # create local variables
-        print("\nWaiting for clients to connect...")
+        if self.optimisation == False:
+            print("\nWaiting for clients to connect...")
         signals = {}
         clients = 0
         history = []
@@ -101,7 +106,8 @@ class TradeManager:
                 # add signal to signals dict
                 if signal['symbol'] not in signals:
                     clients += 1
-                    print(signal['symbol'] + " Connected")
+                    if self.optimisation == False:
+                        print(signal['symbol'] + " Connected")
                     signals[signal['symbol']] = signal
 
                 # sort the signals alphabetically to make sure results are not random
@@ -143,9 +149,10 @@ class TradeManager:
                 if kbfunc() != -1:  # poll keyboard for ctrl-z to exit (or move on to testing)
                     break
 
-        print("Total of", len(signals), "clients connected")
-        print()
-        print("Starting backtest:")
+        if self.optimisation == False:
+            print("Total of", len(signals), "clients connected")
+            print()
+            print("Starting backtest:")
 
         # second loop to trade all the signals
         while True:
@@ -212,16 +219,18 @@ class TradeManager:
                     evz_val = check_evz(signals[symbol]['date'])
                     if evz_val == 0 or evz_val >= self.evz_treshold:
                         evz = True
-                        print(f'$EVZ value: {evz_val}')
+                        if self.optimisation == False:
+                            print(f'$EVZ value: {evz_val}')
                     else:
                         if evz_msg:
                             evz_msg = False
-                            print(f'$EVZ too low: {evz_val}')
+                            if self.optimisation == False:
+                                print(f'$EVZ too low: {evz_val}')
 
                 # check for upcoming news events
                 if self.news_avoidance:
                     news = check_for_news(
-                        self.news_hours, signals[symbol]['date'], symbol, base, quote, self.filter_high_impact_news_only)
+                        self.news_hours, signals[symbol]['date'], symbol, base, quote, self.optimisation, self.filter_high_impact_news_only)
 
                     if news == True:
                         # if first trade hit tp then do nothing. We are risk free
@@ -251,7 +260,9 @@ class TradeManager:
                                     exposure[quote]['LONG'] = 2
 
                         if not trade:
-                            print(f" **** CURRENCY EXPOSURE ON {symbol} *** ")
+                            if self.optimisation == False:
+                                print(
+                                    f" **** CURRENCY EXPOSURE ON {symbol} *** ")
 
                 # set the instructions that will be sent to the EA
                 if trade:
@@ -273,10 +284,12 @@ class TradeManager:
 
             balance.append(bal)
             equity.append(eq)
-            print(f'Equity: {round(eq, 2)}%')
-            print(f'Balance: {round(bal, 2)}%')
 
-            print("Sending instructions via PUB socket")
+            if self.optimisation == False:
+                print(f'Equity: {round(eq, 2)}%')
+                print(f'Balance: {round(bal, 2)}%')
+
+                print("Sending instructions via PUB socket")
 
             # send all the instructions to testers
             for symbol in signals:
@@ -352,12 +365,14 @@ class TradeManager:
 
                     # break out of loop once we have signals from every client
                     if len(signals) == clients:
-                        print("Recieved all signals via REP socket")
+                        if self.optimisation == False:
+                            print("Recieved all signals via REP socket")
 
                         for symbol in signals:
                             # print recieved signals to terminal
-                            print(
-                                f"{symbol}: date: {signals[symbol]['date']}, trade1: {signals[symbol]['trade1']}, trade2: {signals[symbol]['trade2']}, open_orders: {signals[symbol]['open_orders']}, signal: {signals[symbol]['signal']}, balance: {signals[symbol]['balance']}, equity: {signals[symbol]['equity']}")
+                            if self.optimisation == False:
+                                print(
+                                    f"{symbol}: date: {signals[symbol]['date']}, trade1: {signals[symbol]['trade1']}, trade2: {signals[symbol]['trade2']}, open_orders: {signals[symbol]['open_orders']}, signal: {signals[symbol]['signal']}, balance: {signals[symbol]['balance']}, equity: {signals[symbol]['equity']}")
 
                         break
 
@@ -368,12 +383,12 @@ class TradeManager:
             if self.optimisation == True:
                 if signals[list(signals.keys())[0]]['finished'] == True:
                     # DEINIT
-                    print('\nFINISHED\n')
+                    # print('\nFINISHED\n')
 
                     # once done testing, calculate all the statistics
                     total_stats = calculateStats(
                         stats, history, self.pairs_to_use,
-                        self.start_date, self.end_date, balance, equity
+                        self.start_date, self.end_date, balance, equity, self.optimisation
                     )
 
                     return total_stats

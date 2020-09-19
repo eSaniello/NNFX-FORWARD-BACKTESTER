@@ -4,7 +4,7 @@ from dateutil.relativedelta import relativedelta
 
 # https://docs.mql4.com/constants/environment_state/statistics#enum_statistics
 
-def calculateStats(stats, _trades, pairs, _start_date, _end_date, balance, equity):
+def calculateStats(stats, _trades, pairs, _start_date, _end_date, balance, equity, optimisation):
     total_stats = {}
     start_date = datetime.strptime(_start_date, '%Y.%m.%d')
     end_date = datetime.strptime(_end_date, '%Y.%m.%d')
@@ -40,13 +40,8 @@ def calculateStats(stats, _trades, pairs, _start_date, _end_date, balance, equit
     total_stats['init_balance'] = initial_balance
     total_stats['stats_per_symbol'] = []
 
-    print('=====STATS=====')
-    print(f'Total pairs tested: {len(pairs)}')
-    print(f'Start date: {_start_date}')
-    print(f'End date: {_end_date}')
-    print(f'Initial balance: ${initial_balance}')
-
-    print('\n=====STATS PER PAIR=====')
+    if optimisation == False:
+        print('\n=====STATS PER PAIR=====')
 
     for symbol in pairs:
         total_net_profit += stats[symbol]['STAT_PROFIT']
@@ -63,8 +58,9 @@ def calculateStats(stats, _trades, pairs, _start_date, _end_date, balance, equit
             'trades': stats[symbol]['STAT_TRADES']
         })
 
-        print(
-            f"{symbol} = profit: ${round(stats[symbol]['STAT_PROFIT'], 2)}, winrate: {stats[symbol]['STAT_WINRATE']}%, drawdown: {round(stats[symbol]['STAT_BALANCE_DDREL_PERCENT'], 2)}%, profit_factor: {round(stats[symbol]['STAT_PROFIT_FACTOR'], 2)}, trades: {stats[symbol]['STAT_TRADES']}")
+        if optimisation == False:
+            print(
+                f"{symbol} = profit: ${round(stats[symbol]['STAT_PROFIT'], 2)}, winrate: {stats[symbol]['STAT_WINRATE']}%, drawdown: {round(stats[symbol]['STAT_BALANCE_DDREL_PERCENT'], 2)}%, profit_factor: {round(stats[symbol]['STAT_PROFIT_FACTOR'], 2)}, trades: {stats[symbol]['STAT_TRADES']}")
 
     end_balance = initial_balance + total_net_profit
     averag_winrate = averag_winrate / len(pairs)
@@ -85,18 +81,23 @@ def calculateStats(stats, _trades, pairs, _start_date, _end_date, balance, equit
     total_stats['total_trades'] = len(trades)
     total_stats['max_drawdown'] = round(max_dd, 2)
 
-    print('\n=====FINAL STATS=====')
-    print(f'Total net profit: ${round(total_net_profit, 2)}')
-    print(f'End balance: ${round(end_balance, 2)}')
-    print(f'Average winrate: {round(averag_winrate, 2)}%')
-    print(f'Total gross profit: ${round(total_gross_profit, 2)}')
-    print(f'Total gross loss: ${round(total_gross_loss, 2)}')
-    print(f'Profit factor: {round(profit_factor, 2)}')
-    print(
-        f'Annual ROI (%): {round(annual_roi, 2) if date_diff.years > 0 else "-"}%')
-    print(f'Total ROI (%): {round(total_return, 2)}%')
-    print(f'Total trades: {len(trades)}')
-    print(f'Max drawdown: {round(max_dd, 2)}%')
+    if optimisation == False:
+        print('\n=====FINAL STATS=====')
+        print(f'Total pairs tested: {len(pairs)}')
+        print(f'Start date: {_start_date}')
+        print(f'End date: {_end_date}')
+        print(f'Initial balance: ${initial_balance}')
+        print(f'Total net profit: ${round(total_net_profit, 2)}')
+        print(f'End balance: ${round(end_balance, 2)}')
+        print(f'Average winrate: {round(averag_winrate, 2)}%')
+        print(f'Total gross profit: ${round(total_gross_profit, 2)}')
+        print(f'Total gross loss: ${round(total_gross_loss, 2)}')
+        print(f'Profit factor: {round(profit_factor, 2)}')
+        print(
+            f'Annual ROI (%): {round(annual_roi, 2) if date_diff.years > 0 else "-"}%')
+        print(f'Total ROI (%): {round(total_return, 2)}%')
+        print(f'Total trades: {len(trades)}')
+        print(f'Max drawdown: {round(max_dd, 2)}%')
 
     return total_stats
 
