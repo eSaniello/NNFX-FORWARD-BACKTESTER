@@ -1,0 +1,11 @@
+Settings,Initial balance,Net profit,End balance,Average winrate(%),Total gross profit,Total gross loss,Profit factor,Annual ROI(%),Total ROI(%),Max DD
+"{'takeProfitPercent': 0.4, 'stoplossPercent': 0.4}",10000.0,-1482.14,8517.86,41.77,5062.66,-6544.8,0.77,-4.94,-14.82,266,25.52
+"{'takeProfitPercent': 0.4, 'stoplossPercent': 0.6000000000000001}",10000.0,-1479.55,8520.45,41.77,5050.48,-6530.03,0.77,-4.93,-14.8,266,25.39
+"{'takeProfitPercent': 0.4, 'stoplossPercent': 0.8}",10000.0,-1479.71,8520.29,41.77,5050.97,-6530.68,0.77,-4.93,-14.8,266,25.39
+"{'takeProfitPercent': 0.4, 'stoplossPercent': 1.0}",10000.0,-1479.96,8520.04,41.77,5051.08,-6531.04,0.77,-4.93,-14.8,266,25.39
+"{'takeProfitPercent': 0.4, 'stoplossPercent': 1.2000000000000002}",10000.0,-1480.03,8519.97,41.77,5051.49,-6531.52,0.77,-4.93,-14.8,266,25.39
+"{'takeProfitPercent': 0.4, 'stoplossPercent': 1.4000000000000001}",10000.0,-1480.1,8519.9,41.77,5051.47,-6531.57,0.77,-4.93,-14.8,266,25.39
+"{'takeProfitPercent': 0.4, 'stoplossPercent': 1.6}",10000.0,-1479.87,8520.13,41.77,5051.36,-6531.23,0.77,-4.93,-14.8,266,25.39
+"{'takeProfitPercent': 0.4, 'stoplossPercent': 1.8}",10000.0,-1479.58,8520.42,41.77,5050.77,-6530.35,0.77,-4.93,-14.8,266,25.39
+"{'takeProfitPercent': 0.4, 'stoplossPercent': 2.0}",10000.0,-1479.65,8520.35,41.77,5050.52,-6530.17,0.77,-4.93,-14.8,266,25.4
+"{'takeProfitPercent': 0.6000000000000001, 'stoplossPercent': 0.4}",10000.0,-1479.42,8520.58,41.77,5050.21,-6529.63,0.77,-4.93,-14.79,266,25.4
