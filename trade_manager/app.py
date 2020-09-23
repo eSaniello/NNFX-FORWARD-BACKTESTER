@@ -15,7 +15,6 @@ optimisation = True
 evz_treshold = 3
 news_avoidance = True
 expert_name = 'NNFX FORWARD BACKTESTER'
-settings_setfile = 'nnfx_forward_backtester'
 timeframe = 'D1'  # M1, M5, M15, M30, H1, H4, D1, W1, MN
 start_date = '2017.01.01'
 end_date = '2020.08.10'
@@ -83,7 +82,6 @@ if optimisation:
             news_hours=24,
             filter_high_impact_news_only=False,
             expert_name=expert_name,
-            settings_setfile=settings_setfile,
             timeframe=timeframe,
             start_date=start_date,
             end_date=end_date,
@@ -112,10 +110,11 @@ if optimisation:
         if not offline:
             # add each iteration result to a google sheet so I can see the progress
             sheet.append_row(insertRow)
+            time.sleep(1.5)
         else:
             append_list_as_row('optimisation.csv', insertRow)
+            time.sleep(1.5)
 
-        time.sleep(1)
 else:
     manager = TradeManager(
         pairs_to_use=benchmark_fx_pairs,
@@ -124,7 +123,6 @@ else:
         news_hours=24,
         filter_high_impact_news_only=False,
         expert_name=expert_name,
-        settings_setfile=settings_setfile,
         timeframe=timeframe,
         start_date=start_date,
         end_date=end_date,

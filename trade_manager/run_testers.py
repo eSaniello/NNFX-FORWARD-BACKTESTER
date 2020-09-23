@@ -3,7 +3,6 @@ import shlex
 
 
 expert_token = "<EXPERT>"
-file_token = "<FILE>"
 symbol_token = "<SYMBOL>"
 timeframe_token = "<TIMEFRAME>"
 start_date_token = "<START_DATE>"
@@ -28,12 +27,11 @@ def replace_in_file(file_path, str_search, str_replace):
     fin.close()
 
 
-def run_testers(pairs, _expert_name, _settings_setfile, _timeframe, _spread, _start_date, _end_date, optimisation):
+def run_testers(pairs, _expert_name, _timeframe, _spread, _start_date, _end_date, optimisation):
     for pair in pairs:
         # change .ini file for every tester
         path_to_ini_file = f'testers/{pair}/config/nnfx_forward_backtester.ini'
         replace_in_file(path_to_ini_file, expert_token, _expert_name)
-        replace_in_file(path_to_ini_file, file_token, _settings_setfile)
         replace_in_file(path_to_ini_file, symbol_token, pair)
         replace_in_file(path_to_ini_file, timeframe_token, _timeframe)
         replace_in_file(path_to_ini_file, spread_token, _spread)

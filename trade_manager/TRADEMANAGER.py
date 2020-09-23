@@ -14,12 +14,11 @@ from stats import calculateStats
 
 class TradeManager:
     # Initialize all parameters first
-    def __init__(self, evz_treshold, news_avoidance, news_hours, filter_high_impact_news_only, expert_name, settings_setfile, timeframe, start_date, end_date, spread, pairs_to_use, optimisation):
+    def __init__(self, evz_treshold, news_avoidance, news_hours, filter_high_impact_news_only, expert_name, timeframe, start_date, end_date, spread, pairs_to_use, optimisation):
 
         self.evz_treshold = evz_treshold
         self.news_avoidance = news_avoidance
         self.expert_name = expert_name
-        self.settings_setfile = settings_setfile
         self.timeframe = timeframe
         self.start_date = start_date
         self.end_date = end_date
@@ -42,7 +41,7 @@ class TradeManager:
     def start_testers(self):
         if self.optimisation == False:
             print('\nStarting all clients...')
-        run_testers(self.pairs_to_use, self.expert_name, self.settings_setfile,
+        run_testers(self.pairs_to_use, self.expert_name,
                     self.timeframe, self.spread, self.start_date, self.end_date, self.optimisation)
 
     # start the server and begin trading
@@ -408,7 +407,7 @@ class TradeManager:
                         # once done testing, calculate all the statistics
                         total_stats = calculateStats(
                             stats, history, self.pairs_to_use,
-                            self.start_date, self.end_date, balance, equity
+                            self.start_date, self.end_date, balance, equity, self.optimisation
                         )
 
                         return total_stats
