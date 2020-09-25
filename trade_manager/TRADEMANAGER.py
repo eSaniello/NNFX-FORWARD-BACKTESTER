@@ -3,6 +3,7 @@ import time
 import sys
 import msvcrt
 import json
+import datetime
 from copy_indi_and_ea import _copy_files_to_testers
 from run_testers import run_testers
 from evz import check_evz
@@ -95,6 +96,9 @@ class TradeManager:
                 sys.exit()
 
             return ret
+
+        # create log file and log all print statements to it for later manual analysis
+        f = open(f"output/output_{datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')}.txt", "w")
 
         # first loop to check if all testers are connected
         while True:
@@ -220,11 +224,13 @@ class TradeManager:
                         evz = True
                         if self.optimisation == False:
                             print(f'$EVZ value: {evz_val}')
+                            f.write(f'$EVZ value: {evz_val}\n')
                     else:
                         if evz_msg:
                             evz_msg = False
                             if self.optimisation == False:
                                 print(f'$EVZ too low: {evz_val}')
+                                f.write(f'$EVZ too low: {evz_val}\n')
 
                 # check for upcoming news events
                 if self.news_avoidance:
@@ -262,6 +268,7 @@ class TradeManager:
                             if self.optimisation == False:
                                 print(
                                     f" **** CURRENCY EXPOSURE ON {symbol} *** ")
+                                f.write(f' **** CURRENCY EXPOSURE ON {symbol} *** \n')
 
                 # set the instructions that will be sent to the EA
                 if trade:
@@ -287,6 +294,8 @@ class TradeManager:
             if self.optimisation == False:
                 print(f'Equity: {round(eq, 2)}%')
                 print(f'Balance: {round(bal, 2)}%')
+                f.write(f'Equity: {round(eq, 2)}% \n')
+                f.write(f'Balance: {round(bal, 2)}% \n')
 
                 print("Sending instructions via PUB socket")
 
@@ -373,6 +382,8 @@ class TradeManager:
                                 print(
                                     f"{symbol}: date: {signals[symbol]['date']}, trade1: {signals[symbol]['trade1']}, trade2: {signals[symbol]['trade2']}, open_orders: {signals[symbol]['open_orders']}, signal: {signals[symbol]['signal']}, balance: {signals[symbol]['balance']}, equity: {signals[symbol]['equity']}")
 
+                                f.write(f"{symbol}: date: {signals[symbol]['date']}, trade1: {signals[symbol]['trade1']}, trade2: {signals[symbol]['trade2']}, open_orders: {signals[symbol]['open_orders']}, signal: {signals[symbol]['signal']}, balance: {signals[symbol]['balance']}, equity: {signals[symbol]['equity']}\n")
+
                         break
 
                 except zmq.error.Again:
@@ -383,6 +394,7 @@ class TradeManager:
                 if signals[list(signals.keys())[0]]['finished'] == True:
                     # DEINIT
                     # print('\nFINISHED\n')
+                    f.close()
 
                     # once done testing, calculate all the statistics
                     total_stats = calculateStats(
@@ -403,6 +415,7 @@ class TradeManager:
                     if counter >= clients:
                         # DEINIT
                         print('\nFINISHED\n')
+                        f.close()
 
                         # once done testing, calculate all the statistics
                         total_stats = calculateStats(

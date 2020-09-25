@@ -11,12 +11,12 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 # SETTINGS
 offline = True
-optimisation = True
+optimisation = False
 evz_treshold = 3
 news_avoidance = True
 expert_name = 'NNFX FORWARD BACKTESTER'
 timeframe = 'D1'  # M1, M5, M15, M30, H1, H4, D1, W1, MN
-start_date = '2017.01.01'
+start_date = '2019.01.01'
 end_date = '2020.08.10'
 spread = '5'  # 0 = use current spread
 
@@ -53,12 +53,14 @@ if not offline:
 # range and linear mix: 'name>2~7,8,9,10~12'
 optimisation_variables = [
     # 'evz_treshold>2~8:2',
-    'takeProfitPercent>0.4~2.0:0.2',
-    'stoplossPercent>0.4~2.0:0.2'
+    # 'takeProfitPercent>0.4~2.0:0.2',
+    # 'stoplossPercent>0.4~2.0:0.2'
     # 'evz_treshold>1~10',
     # 'lookBackDays>180,365,730',
     # 'news_avoidance',
-    # 'MaPeriod>5~15:5'
+    'MaPeriod>4~30:2',
+    'sensitivity>0.2~2.4:0.2',
+    '_length>4~30:2'
 ]
 
 if optimisation:
@@ -69,9 +71,11 @@ if optimisation:
     for setting in tqdm(optimisationList, file=sys.stdout, desc='Running test'):
         # Apply settings to EAname.ini settings file
         apply_setting_to_ini_file(
-            'takeProfitPercent', setting['takeProfitPercent'])
+            'MaPeriod', setting['MaPeriod'])
         apply_setting_to_ini_file(
-            'stoplossPercent', setting['stoplossPercent'])
+            'sensitivity', setting['sensitivity'])
+        apply_setting_to_ini_file(
+            '_length', setting['_length'])
 
         manager = TradeManager(
             pairs_to_use=benchmark_fx_pairs,
