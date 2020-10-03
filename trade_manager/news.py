@@ -135,6 +135,6 @@ def check_for_news(hours, date, symbol, base, quote, optimisation, high_impact_o
                     print(f'{symbol} News time out: {title} - {news_date}')
                 return True
 
-    return False
     con.commit()
     con.close()
+    return False
