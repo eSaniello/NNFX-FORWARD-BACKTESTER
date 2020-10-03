@@ -98,7 +98,8 @@ class TradeManager:
             return ret
 
         # create log file and log all print statements to it for later manual analysis
-        f = open(f"output/output_{datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')}.txt", "w")
+        f = open(
+            f"output/output_{datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')}.txt", "w")
 
         # first loop to check if all testers are connected
         while True:
@@ -268,7 +269,8 @@ class TradeManager:
                             if self.optimisation == False:
                                 print(
                                     f" **** CURRENCY EXPOSURE ON {symbol} *** ")
-                                f.write(f' **** CURRENCY EXPOSURE ON {symbol} *** \n')
+                                f.write(
+                                    f' **** CURRENCY EXPOSURE ON {symbol} *** \n')
 
                 # set the instructions that will be sent to the EA
                 if trade:
@@ -382,7 +384,8 @@ class TradeManager:
                                 print(
                                     f"{symbol}: date: {signals[symbol]['date']}, trade1: {signals[symbol]['trade1']}, trade2: {signals[symbol]['trade2']}, open_orders: {signals[symbol]['open_orders']}, signal: {signals[symbol]['signal']}, balance: {signals[symbol]['balance']}, equity: {signals[symbol]['equity']}")
 
-                                f.write(f"{symbol}: date: {signals[symbol]['date']}, trade1: {signals[symbol]['trade1']}, trade2: {signals[symbol]['trade2']}, open_orders: {signals[symbol]['open_orders']}, signal: {signals[symbol]['signal']}, balance: {signals[symbol]['balance']}, equity: {signals[symbol]['equity']}\n")
+                                f.write(
+                                    f"{symbol}: date: {signals[symbol]['date']}, trade1: {signals[symbol]['trade1']}, trade2: {signals[symbol]['trade2']}, open_orders: {signals[symbol]['open_orders']}, signal: {signals[symbol]['signal']}, balance: {signals[symbol]['balance']}, equity: {signals[symbol]['equity']}\n")
 
                         break
 

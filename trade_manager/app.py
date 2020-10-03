@@ -31,6 +31,7 @@ benchmark_fx_pairs = ['EURUSD', 'AUDNZD', 'EURGBP', 'AUDCAD', 'CHFJPY']
 dummy_pairs = ["AUDCAD"]
 
 # ##################################
+sheet = None
 if not offline:
     scope = [
         "https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/spreadsheets',
@@ -52,15 +53,13 @@ if not offline:
 # linear: 'name>1,2,3,4,5'
 # range and linear mix: 'name>2~7,8,9,10~12'
 optimisation_variables = [
-    # 'evz_treshold>2~8:2',
-    # 'takeProfitPercent>0.4~2.0:0.2',
+    'evz_treshold>2~8:2',
+    'RiskPercent>0.6~1.0:0.2',
     # 'stoplossPercent>0.4~2.0:0.2'
     # 'evz_treshold>1~10',
     # 'lookBackDays>180,365,730',
     # 'news_avoidance',
-    'MaPeriod>4~30:2',
-    'sensitivity>0.2~2.4:0.2',
-    '_length>4~30:2'
+    'scaleOut',
 ]
 
 if optimisation:
@@ -71,16 +70,14 @@ if optimisation:
     for setting in tqdm(optimisationList, file=sys.stdout, desc='Running test'):
         # Apply settings to EAname.ini settings file
         apply_setting_to_ini_file(
-            'MaPeriod', setting['MaPeriod'])
+            'scaleOut', setting['scaleOut'])
         apply_setting_to_ini_file(
-            'sensitivity', setting['sensitivity'])
-        apply_setting_to_ini_file(
-            '_length', setting['_length'])
+            'RiskPercent', setting['RiskPercent'])
 
         manager = TradeManager(
             pairs_to_use=benchmark_fx_pairs,
-            # evz_treshold=setting['evz_treshold'],
-            evz_treshold=evz_treshold,
+            evz_treshold=setting['evz_treshold'],
+            # evz_treshold=evz_treshold,
             # news_avoidance=setting['news_avoidance'],
             news_avoidance=news_avoidance,
             news_hours=24,
@@ -120,20 +117,25 @@ if optimisation:
             time.sleep(1.5)
 
 else:
-    manager = TradeManager(
-        pairs_to_use=benchmark_fx_pairs,
-        evz_treshold=evz_treshold,
-        news_avoidance=news_avoidance,
-        news_hours=24,
-        filter_high_impact_news_only=False,
-        expert_name=expert_name,
-        timeframe=timeframe,
-        start_date=start_date,
-        end_date=end_date,
-        spread=spread,
-        optimisation=optimisation
-    )
+    one_run = False
+    while True:
+        if not one_run:
+            manager = TradeManager(
+                pairs_to_use=benchmark_fx_pairs,
+                evz_treshold=evz_treshold,
+                news_avoidance=news_avoidance,
+                news_hours=24,
+                filter_high_impact_news_only=False,
+                expert_name=expert_name,
+                timeframe=timeframe,
+                start_date=start_date,
+                end_date=end_date,
+                spread=spread,
+                optimisation=optimisation
+            )
 
-    manager.copy_files_to_testers()
-    manager.start_testers()
-    stats = manager.start_trade_manager()
+            manager.copy_files_to_testers()
+            manager.start_testers()
+            stats = manager.start_trade_manager()
+
+            one_run = True
