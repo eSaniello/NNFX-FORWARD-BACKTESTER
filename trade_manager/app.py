@@ -16,7 +16,7 @@ evz_treshold = 3
 news_avoidance = True
 expert_name = 'NNFX FORWARD BACKTESTER'
 timeframe = 'D1'  # M1, M5, M15, M30, H1, H4, D1, W1, MN
-start_date = '2019.01.01'
+start_date = '2015.01.01'
 end_date = '2020.08.10'
 spread = '5'  # 0 = use current spread
 
@@ -54,12 +54,12 @@ if not offline:
 # range and linear mix: 'name>2~7,8,9,10~12'
 optimisation_variables = [
     'evz_treshold>2~8:2',
-    'RiskPercent>0.6~1.0:0.2',
-    # 'stoplossPercent>0.4~2.0:0.2'
-    # 'evz_treshold>1~10',
-    # 'lookBackDays>180,365,730',
-    # 'news_avoidance',
+    'news_avoidance',
     'scaleOut',
+    'RiskPercent>0.6~1.0:0.2',
+    'baselineATRFilter',
+    'filterPullbacks',
+    'use7CandleRule'
 ]
 
 if optimisation:
@@ -73,13 +73,19 @@ if optimisation:
             'scaleOut', setting['scaleOut'])
         apply_setting_to_ini_file(
             'RiskPercent', setting['RiskPercent'])
+        apply_setting_to_ini_file(
+            'baselineATRFilter', setting['baselineATRFilter'])
+        apply_setting_to_ini_file(
+            'filterPullbacks', setting['filterPullbacks'])
+        apply_setting_to_ini_file(
+            'use7CandleRule', setting['use7CandleRule'])
 
         manager = TradeManager(
             pairs_to_use=benchmark_fx_pairs,
             evz_treshold=setting['evz_treshold'],
             # evz_treshold=evz_treshold,
-            # news_avoidance=setting['news_avoidance'],
-            news_avoidance=news_avoidance,
+            news_avoidance=setting['news_avoidance'],
+            # news_avoidance=news_avoidance,
             news_hours=24,
             filter_high_impact_news_only=False,
             expert_name=expert_name,
@@ -114,7 +120,7 @@ if optimisation:
             time.sleep(1.5)
         else:
             append_list_as_row('optimisation.csv', insertRow)
-            time.sleep(1.5)
+            time.sleep(2)
 
 else:
     one_run = False
