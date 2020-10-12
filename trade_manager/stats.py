@@ -66,8 +66,9 @@ def calculateStats(stats, _trades, pairs, _start_date, _end_date, balance, equit
     averag_winrate = averag_winrate / len(pairs)
     profit_factor = (total_gross_profit / (total_gross_loss * -1))
     date_diff = relativedelta(end_date, start_date)
-    annual_roi = (total_net_profit / (date_diff.years) / initial_balance) * 100
     total_return = (total_net_profit / initial_balance) * 100
+    annual_roi = (total_net_profit / (date_diff.years) /
+                  initial_balance) * 100 if date_diff.years > 0 else total_return
 
     total_stats['net_profit'] = round(total_net_profit, 2)
     total_stats['end_balance'] = round(end_balance, 2)

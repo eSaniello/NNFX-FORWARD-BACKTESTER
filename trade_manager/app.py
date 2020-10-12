@@ -15,8 +15,8 @@ optimisation = False
 evz_treshold = 3
 news_avoidance = True
 expert_name = 'NNFX FORWARD BACKTESTER'
-timeframe = 'D1'  # M1, M5, M15, M30, H1, H4, D1, W1, MN
-start_date = '2018.01.01'
+timeframe = 'H1'  # M1, M5, M15, M30, H1, H4, D1, W1, MN
+start_date = '2020.08.01'
 end_date = '2020.08.10'
 spread = '5'  # 0 = use current spread
 
