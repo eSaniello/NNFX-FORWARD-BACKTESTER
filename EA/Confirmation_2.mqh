@@ -6,9 +6,8 @@
 
 input string CONFIRMATION_2 = "===========================CONFIRMATION 2===========================";
 
-extern int                 timeframe = 0;
-extern int                 averagePeriod = 10;
-extern double              sensitivity = 1.0;
+extern int                 lookbackPeriod = 3;
+extern int                 priceField = 0;
 
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -17,12 +16,13 @@ eSignal getC2Signal(int offset)
   {
    eSignal _signal = FLAT;
 
-   if(iCustom(Symbol(), 0, "ALGO 1\\precision trend 2.2 (histo)", timeframe,averagePeriod,sensitivity,0, offset) == 1)
+   if(iCustom(Symbol(), _Period, "new\\Weis Wave Volume [KHT]", lookbackPeriod,priceField,0, offset) != 0.0)
       _signal = LONG;
    else
-      if(iCustom(Symbol(), 0, "ALGO 1\\precision trend 2.2 (histo)", timeframe,averagePeriod,sensitivity,1, offset) == 1)
+      if(iCustom(Symbol(), _Period, "new\\Weis Wave Volume [KHT]", lookbackPeriod,priceField,1, offset) != 0.0)
          _signal = SHORT;
 
    return _signal;
   }
+//+------------------------------------------------------------------+
 //+------------------------------------------------------------------+

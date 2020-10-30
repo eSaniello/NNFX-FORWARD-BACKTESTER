@@ -6,15 +6,14 @@
 
 input string BASELINE = "===========================BASELINE===========================";
 
-extern int                 _length = 7;
-
+extern int                 _cutOffPeriod = 15;
 
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
 double getBaselineValue(int offset)
   {
-   double baseline = iCustom(_Symbol, _Period, "ALGO 1\\WMA",_length,0,offset);
+   double baseline = iCustom(_Symbol, _Period, "new\\TwoPoleButterworthFilter",_cutOffPeriod,0,offset);
 
    return baseline;
   }

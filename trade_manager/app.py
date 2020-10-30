@@ -13,12 +13,12 @@ from oauth2client.service_account import ServiceAccountCredentials
 offline = True
 optimisation = False
 evz_treshold = 3
-news_avoidance = True
+news_avoidance = False
 expert_name = 'NNFX FORWARD BACKTESTER'
-timeframe = 'H1'  # M1, M5, M15, M30, H1, H4, D1, W1, MN
-start_date = '2020.08.01'
+timeframe = 'M15'  # M1, M5, M15, M30, H1, H4, D1, W1, MN
+start_date = '2020.06.01'
 end_date = '2020.08.10'
-spread = '5'  # 0 = use current spread
+spread = '1'  # 0 = use current spread
 
 # List of pairs to test
 forex_pairs = [
@@ -26,9 +26,11 @@ forex_pairs = [
     "GBPAUD", "GBPCAD", "GBPCHF", "GBPJPY", "GBPNZD", "GBPUSD", "NZDCHF", "NZDCAD", "NZDJPY", "NZDUSD", "USDCAD", "USDCHF", "USDJPY"
 ]
 
-benchmark_fx_pairs = ['EURUSD', 'AUDNZD', 'EURGBP', 'AUDCAD', 'CHFJPY']
+benchmark_fx_pairs = ['EURUSD', 'AUDNZD', 'AUDCAD', 'CHFJPY', 'EURGBP']
 
 dummy_pairs = ["AUDCAD"]
+
+pairs = forex_pairs
 
 # ##################################
 sheet = None
@@ -53,13 +55,14 @@ if not offline:
 # linear: 'name>1,2,3,4,5'
 # range and linear mix: 'name>2~7,8,9,10~12'
 optimisation_variables = [
-    'evz_treshold>2~8:2',
-    'news_avoidance',
+    # 'evz_treshold>2~8:2',
+    # 'news_avoidance',
     'scaleOut',
-    'RiskPercent>0.6~1.0:0.2',
-    'baselineATRFilter',
+    'use7CandleRule',
     'filterPullbacks',
-    'use7CandleRule'
+    'baselineATRFilter',
+    # 'takeProfitPercent>0.5~2.0:0.1',
+    # 'stoplossPercent>0.5~2.0:0.1'
 ]
 
 if optimisation:
@@ -72,20 +75,22 @@ if optimisation:
         apply_setting_to_ini_file(
             'scaleOut', setting['scaleOut'])
         apply_setting_to_ini_file(
-            'RiskPercent', setting['RiskPercent'])
-        apply_setting_to_ini_file(
-            'baselineATRFilter', setting['baselineATRFilter'])
+            'use7CandleRule', setting['use7CandleRule'])
         apply_setting_to_ini_file(
             'filterPullbacks', setting['filterPullbacks'])
         apply_setting_to_ini_file(
-            'use7CandleRule', setting['use7CandleRule'])
+            'baselineATRFilter', setting['baselineATRFilter'])
+        # apply_setting_to_ini_file(
+        #     'takeProfitPercent', setting['takeProfitPercent'])
+        # apply_setting_to_ini_file(
+        #     'stoplossPercent', setting['stoplossPercent'])
 
         manager = TradeManager(
-            pairs_to_use=benchmark_fx_pairs,
-            evz_treshold=setting['evz_treshold'],
-            # evz_treshold=evz_treshold,
-            news_avoidance=setting['news_avoidance'],
-            # news_avoidance=news_avoidance,
+            pairs_to_use=pairs,
+            # evz_treshold=setting['evz_treshold'],
+            evz_treshold=evz_treshold,
+            # news_avoidance=setting['news_avoidance'],
+            news_avoidance=news_avoidance,
             news_hours=24,
             filter_high_impact_news_only=False,
             expert_name=expert_name,
@@ -127,7 +132,7 @@ else:
     while True:
         if not one_run:
             manager = TradeManager(
-                pairs_to_use=benchmark_fx_pairs,
+                pairs_to_use=pairs,
                 evz_treshold=evz_treshold,
                 news_avoidance=news_avoidance,
                 news_hours=24,

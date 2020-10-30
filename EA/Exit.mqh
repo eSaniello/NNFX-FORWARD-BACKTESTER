@@ -6,8 +6,7 @@
 
 input string EXIT = "===========================EXIT===========================";
 
-extern int                 SMMA_period = 8;
-extern int                 stochastic_period = 5;
+extern int                 exit_length = 8;
 
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -16,22 +15,14 @@ eSignal getExitSignal(int offset)
   {
    eSignal exitSignal = FLAT;
 
-   eSignal baseline = getBaselineSignal(offset);
 
-
-   if(baseline == LONG)
-      exitSignal = SHORT;
+   if(iCustom(_Symbol, _Period, "new\\EhlersFisherTransform",exit_length,0,offset) <
+      iCustom(_Symbol, _Period, "new\\EhlersFisherTransform",exit_length,1,offset))
+      exitSignal = LONG;
    else
-      if(baseline == SHORT)
-         exitSignal = LONG;
-
-//if(iCustom(_Symbol, _Period, "ALGO 1\\(B)DSS Bressert",SMMA_period,stochastic_period,0,offset) <
-//   iCustom(_Symbol, _Period, "ALGO 1\\(B)DSS Bressert",SMMA_period,stochastic_period,0,offset + 1))
-//   exitSignal = LONG;
-//else
-//   if(iCustom(_Symbol, _Period, "ALGO 1\\(B)DSS Bressert",SMMA_period,stochastic_period,0,offset) >
-//      iCustom(_Symbol, _Period, "ALGO 1\\(B)DSS Bressert",SMMA_period,stochastic_period,0,offset + 1))
-//      exitSignal = SHORT;
+      if(iCustom(_Symbol, _Period, "new\\EhlersFisherTransform",exit_length,0,offset) >
+         iCustom(_Symbol, _Period, "new\\EhlersFisherTransform",exit_length,1,offset))
+         exitSignal = SHORT;
 
    return exitSignal;
   }
