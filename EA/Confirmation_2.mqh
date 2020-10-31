@@ -6,9 +6,6 @@
 
 input string CONFIRMATION_2 = "===========================CONFIRMATION 2===========================";
 
-extern int                 lookbackPeriod = 3;
-extern int                 priceField = 0;
-
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -16,11 +13,20 @@ eSignal getC2Signal(int offset)
   {
    eSignal _signal = FLAT;
 
-   if(iCustom(Symbol(), _Period, "new\\Weis Wave Volume [KHT]", lookbackPeriod,priceField,0, offset) != 0.0)
+   double up1 = iCustom(Symbol(), _Period, "new\\DIDI_Histogram",0, offset);
+   double up2 = iCustom(Symbol(), _Period, "new\\DIDI_Histogram",2, offset);
+   double dn1 = iCustom(Symbol(), _Period, "new\\DIDI_Histogram",3, offset);
+   double dn2 = iCustom(Symbol(), _Period, "new\\DIDI_Histogram",1, offset);
+
+   if(up1 != EMPTY_VALUE || up2 != EMPTY_VALUE)
+     {
       _signal = LONG;
+     }
    else
-      if(iCustom(Symbol(), _Period, "new\\Weis Wave Volume [KHT]", lookbackPeriod,priceField,1, offset) != 0.0)
+      if(dn1 != EMPTY_VALUE || dn2 != EMPTY_VALUE)
+        {
          _signal = SHORT;
+        }
 
    return _signal;
   }

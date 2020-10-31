@@ -1,6 +1,8 @@
 import shutil
 import os
 import glob
+import sys
+from tqdm import tqdm
 
 
 forex_pairs = ["AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD", "CADCHF", "CADJPY", "CHFJPY", "EURCHF", "EURAUD", "EURCAD", "EURGBP", "EURJPY", "EURNZD", "EURUSD",
@@ -8,17 +10,17 @@ forex_pairs = ["AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDUSD", "CADCHF", "CADJ
 
 
 def copy_data(pairs):
-    for pair in pairs:
-        data = []
+    for pair in tqdm(pairs, file=sys.stdout, desc='Copying'):
 
         files = glob.glob(f'testers/{pair}/history/ICMarkets-Demo01/*')
         for f in files:
             os.remove(f)
 
-        os.chdir("C:/Users/Shaniel Samadhan/AppData/Roaming/MetaQuotes/Terminal/1DAFD9A7C67DC84FE37EAA1FC1E5CF75/history/ICMarkets-Demo01")
+        os.chdir(
+            "C:\\Users\Shaniel Samadhan\\Desktop\\NNFX FORWARD BACKTESTER\\portable mt4\history\\ICMarkets-Demo01")
         for file in glob.glob("*.hst"):
             if file.find(pair) > -1:
-                shutil.copy(f'C:/Users/Shaniel Samadhan/AppData/Roaming/MetaQuotes/Terminal/1DAFD9A7C67DC84FE37EAA1FC1E5CF75/history/ICMarkets-Demo01/{file}',
+                shutil.copy(f'C:\\Users\Shaniel Samadhan\\Desktop\\NNFX FORWARD BACKTESTER\\portable mt4\history\\ICMarkets-Demo01/{file}',
                             f'C:/Users/Shaniel Samadhan/Desktop/NNFX FORWARD BACKTESTER/testers/{pair}/history/ICMarkets-Demo01/')
 
         print(f'Copied data to {pair}')
