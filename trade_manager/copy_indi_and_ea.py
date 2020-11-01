@@ -1,4 +1,5 @@
 import shutil
+import time
 
 
 def _copy_files_to_testers(pairs, optimisation):
@@ -10,6 +11,8 @@ def _copy_files_to_testers(pairs, optimisation):
             f'testers/{pair}/MQL4/Include/')
         shutil.rmtree(
             f'EA/')
+
+        time.sleep(0.2)
 
         # copy the folders
         shutil.copytree(

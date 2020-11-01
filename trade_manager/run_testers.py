@@ -39,8 +39,8 @@ def run_testers(pairs, _expert_name, _timeframe, _spread, _start_date, _end_date
         replace_in_file(path_to_ini_file, end_date_token, _end_date)
 
         # open tester with .ini file to run strategy tester automatically with above specified settings
-        path_to_tester = f"C:\\Users\\Shaniel Samadhan\\Desktop\\NNFX FORWARD BACKTESTER\\testers\\{pair}\\terminal.exe"
-        absolute_path_to_ini_file = f"C:\\Users\\Shaniel Samadhan\\Desktop\\NNFX FORWARD BACKTESTER\\testers\\{pair}\\config\\nnfx_forward_backtester.ini"
+        path_to_tester = f"testers\\{pair}\\terminal.exe"
+        absolute_path_to_ini_file = f"testers\\{pair}\\config\\nnfx_forward_backtester.ini"
         command = f'"{path_to_tester}" "{absolute_path_to_ini_file}" /skipupdate /portable'
         # print(command)
         subprocess.Popen(shlex.split(command))
