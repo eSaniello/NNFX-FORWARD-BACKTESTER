@@ -5,19 +5,16 @@ from optimize import append_list_as_row
 from tqdm import tqdm
 import sys
 import time
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
 
 
 # SETTINGS
-offline = True
 optimisation = False
 evz_treshold = 3
 news_avoidance = False
 expert_name = 'NNFX FORWARD BACKTESTER'
-timeframe = 'M15'  # M1, M5, M15, M30, H1, H4, D1, W1, MN
-start_date = '2020.06.01'
-end_date = '2020.08.10'
+timeframe = 'H1'  # M1, M5, M15, M30, H1, H4, D1, W1, MN
+start_date = '2017.01.01'
+end_date = '2020.11.02'
 spread = '1'  # 0 = use current spread
 
 # List of pairs to test
@@ -28,25 +25,9 @@ forex_pairs = [
 
 benchmark_fx_pairs = ['EURUSD', 'AUDNZD', 'AUDCAD', 'CHFJPY', 'EURGBP']
 
-dummy_pairs = ["AUDCAD"]
-
 pairs = forex_pairs
 
 # ##################################
-sheet = None
-if not offline:
-    scope = [
-        "https://spreadsheets.google.com/feeds", 'https://www.googleapis.com/auth/spreadsheets',
-        "https://www.googleapis.com/auth/drive.file", "https://www.googleapis.com/auth/drive"
-    ]
-
-    creds = ServiceAccountCredentials.from_json_keyfile_name(
-        "creds.json", scope)
-
-    client = gspread.authorize(creds)
-
-    sheet = client.open("trading bot").sheet1  # Open the spreadhseet
-
 # optimisation flow
 # gen optim list >> loop over list >> apply settings to .ini files and copy >> run testers with settings >> repeat
 # FORMAT:
@@ -119,13 +100,8 @@ if optimisation:
         insertRow.append(stats['total_trades'])
         insertRow.append(stats['max_drawdown'])
 
-        if not offline:
-            # add each iteration result to a google sheet so I can see the progress
-            sheet.append_row(insertRow)
-            time.sleep(1.5)
-        else:
-            append_list_as_row('optimisation.csv', insertRow)
-            time.sleep(2)
+        append_list_as_row('optimisation.csv', insertRow)
+        time.sleep(2)
 
 else:
     one_run = False
